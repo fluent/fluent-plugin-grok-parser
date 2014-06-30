@@ -6,6 +6,7 @@ module Fluent
       include Configurable
       config_param :time_format, :string, :default => nil
       config_param :grok_pattern, :string
+      config_param :custom_pattern_path, :string, :default => nil
 
       PATTERN_RE = \
           /%\{    # match '%{' not prefixed with '\'
@@ -18,14 +19,24 @@ module Fluent
       def initialize
         super
         @pattern_map = {}
-        pattern_dir = File.expand_path('../../../../patterns/*', __FILE__)
-        Dir.glob(pattern_dir) do |pattern_file_path|
+        default_pattern_dir = File.expand_path('../../../../patterns/*', __FILE__)
+        Dir.glob(default_pattern_dir) do |pattern_file_path|
           add_patterns_from_file(pattern_file_path)
         end
       end
 
       def configure(conf={})
         super
+
+        if @custom_pattern_path
+          if Dir.exists? @custom_pattern_path
+            Dir.glob(@custom_pattern_path + '/*') do |pattern_file_path|
+              add_patterns_from_file(pattern_file_path)
+            end
+          elsif File.exists? @custom_pattern_path
+            add_patterns_from_file(@custom_pattern_path)
+          end
+        end
 
         begin
           regexp = expand_pattern(conf['grok_pattern'])
