@@ -56,7 +56,7 @@ module Fluent
                                 else
                                   curr_pattern
                                 end
-          pattern.sub!(m[0], replacement_pattern)
+          pattern.sub!(m[0]) do |s| replacement_pattern end
         end
       
         pattern 
