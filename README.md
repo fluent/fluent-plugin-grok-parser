@@ -4,7 +4,7 @@ This is a Fluentd plugin to enable Logstash's Grok-like parsing logic.
 
 ## What's Grok?
 
-Grok is a macro to simplify and reuse regexes, originally developed by [Jordan Sissel](http://github.com/semicomplete).
+Grok is a macro to simplify and reuse regexes, originally developed by [Jordan Sissel](http://github.com/jordansissel).
 
 This is a partial implementation of Grok's grammer that should meet most of the needs.
 
