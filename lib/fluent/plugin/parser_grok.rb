@@ -8,6 +8,8 @@ module Fluent
       config_param :grok_pattern, :string
       config_param :custom_pattern_path, :string, :default => nil
 
+      # Much of the Grok implementation is based on Jordan Sissel's jls-grok
+      # See https://github.com/jordansissel/ruby-grok/blob/master/lib/grok-pure.rb
       PATTERN_RE = \
           /%\{    # match '%{' not prefixed with '\'
              (?<name>     # match the pattern name
