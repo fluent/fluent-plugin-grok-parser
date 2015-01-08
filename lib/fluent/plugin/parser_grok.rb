@@ -5,7 +5,7 @@ module Fluent
     class GrokParser < Parser
       Plugin.register_parser('grok', self)
       config_param :time_format, :string, :default => nil
-      config_param :grok_pattern, :string
+      config_param :grok_pattern, :string, :default => nil
       config_param :custom_pattern_path, :string, :default => nil
 
       # Much of the Grok implementation is based on Jordan Sissel's jls-grok
@@ -25,6 +25,8 @@ module Fluent
         Dir.glob(default_pattern_dir) do |pattern_file_path|
           add_patterns_from_file(pattern_file_path)
         end
+        @default_parser = NoneParser.new
+        @parsers = []
       end
 
       def configure(conf={})
@@ -40,12 +42,13 @@ module Fluent
           end
         end
 
-        begin
-          regexp = expand_pattern(conf['grok_pattern'])
-          $log.info "Expanded the pattern #{conf['grok_pattern']} into #{regexp}"
-          @parser = RegexpParser.new(Regexp.new(regexp), conf)
-        rescue => e
-          $log.error e.backtrace
+        if @grok_pattern
+          @parsers = [expand_pattern_exn(@grok_pattern, conf)]
+        else
+          grok_confs = conf.elements.select {|e| e.name == 'grok'}
+          grok_confs.each do |grok_conf|
+            @parsers << expand_pattern_exn(grok_conf['pattern'], grok_conf)
+          end
         end
       end
 
@@ -55,6 +58,14 @@ module Fluent
           name, pat = line.chomp.split(/\s+/, 2)
           @pattern_map[name] = pat
         end
+      end
+
+      def expand_pattern_exn(pattern, conf)
+        regexp = expand_pattern(pattern)
+        $log.info "Expanded the pattern #{conf['grok_pattern']} into #{regexp}"
+        RegexpParser.new(Regexp.new(regexp), conf)
+      rescue => e
+        $log.error e.backtrace.join("\n")
       end
 
       def expand_pattern(pattern)
@@ -75,11 +86,26 @@ module Fluent
         pattern 
       end
 
-      def call(text, &block)
-        if block
-          @parser.call(text, &block)
+      def parse(text)
+        if block_given?
+          @parsers.each do |parser|
+            parser.parse(text) do |time, record|
+              if time and record
+                yield time, record
+                return
+              end
+            end
+          end
+          yield @default_parser.parse(text)
         else
-          @parser.call(text)
+          @parsers.each do |parser|
+            parser.parse(text) do |time, record|
+              if time and record
+                return time, record
+              end
+            end
+          end
+          return @default_parser.parse(text)
         end
       end
     end
