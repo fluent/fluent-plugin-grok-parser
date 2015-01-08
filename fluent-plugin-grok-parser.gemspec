@@ -18,5 +18,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
-  spec.add_runtime_dependency "fluentd"
+  spec.add_runtime_dependency "fluentd", ">=0.10.58"
 end
