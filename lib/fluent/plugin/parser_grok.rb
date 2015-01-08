@@ -2,8 +2,8 @@ module Fluent
   class TextParser
     class GrokPatternNotFoundError < Exception; end
 
-    class GrokParser
-      include Configurable
+    class GrokParser < Parser
+      Plugin.register_parser('grok', self)
       config_param :time_format, :string, :default => nil
       config_param :grok_pattern, :string
       config_param :custom_pattern_path, :string, :default => nil
@@ -83,7 +83,5 @@ module Fluent
         end
       end
     end
-
-    TextParser.register_template('grok', Proc.new { GrokParser.new })
   end
 end
