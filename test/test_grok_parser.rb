@@ -18,7 +18,14 @@ class GrokParserTest < ::Test::Unit::TestCase
   def internal_test_grok_pattern(grok_pattern, text, expected_time, expected_record, options = {})
     parser = TextParser::GrokParser.new
     parser.configure({"grok_pattern" => grok_pattern}.merge(options))
-    [parser.call(text), parser.call(text) { |time, record| return time, record}].each { |time, record|
+
+    # for the old, return based API
+    time, record = parser.call(text)
+    assert_equal(expected_time, time) if expected_time
+    assert_equal(expected_record, record)
+
+    # for the new API
+    parser.call(text) {|time, record|
       assert_equal(expected_time, time) if expected_time
       assert_equal(expected_record, record)
     }
