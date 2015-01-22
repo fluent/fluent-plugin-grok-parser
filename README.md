@@ -13,12 +13,34 @@ This is a partial implementation of Grok's grammer that should meet most of the 
 You can use it wherever you used the `format` parameter to parse texts. In the following example, it
 extracts the first IP address that matches in the log.
 
-```
+```aconf
 <source>
   type tail
   path /path/to/log
   format grok
   grok_pattern %{IP:ip_address}
+  tag grokked_log
+</source>
+```
+
+**If you want to try multiple grok patterns and use the first matched one**, you can use the following syntax:
+
+```aconf
+<source>
+  type tail
+  path /path/to/log
+  format grok
+  <grok>
+    pattern %{COMBINEDAPACHELOG}
+    time_format "%d/%b/%Y:%H:%M:%S %z"
+  </grok>
+  <grok>
+    pattern %{IP:ip_address}
+  </grok>
+  <grok>
+    pattern %{GREEDYDATA:message}
+  </grok>
+  tag grokked_log
 </source>
 ```
 
