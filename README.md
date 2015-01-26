@@ -113,7 +113,7 @@ The list of supported types are shown below:
 
 For the `time` and `array` types, there is an optional third field after the type name. For the "time" type, you can specify a time format like you would in `time_format`.
 
-For the "array" type, the third field specifies the delimiter (the default is ","). For example, if a field called "item\_ids" contains the value "3,4,5", `types item\_ids:array` parses it as ["3", "4", "5"]. Alternatively, if the value is "Adam|Alice|Bob", `types item_ids:array:|` parses it as ["Adam", "Alice", "Bob"].
+For the "array" type, the third field specifies the delimiter (the default is ","). For example, if a field called "item\_ids" contains the value "3,4,5", `types item_ids:array` parses it as ["3", "4", "5"]. Alternatively, if the value is "Adam|Alice|Bob", `types item_ids:array:|` parses it as ["Adam", "Alice", "Bob"].
 
 Here is a sample config using the Grok parser with `in_tail` and the `types` parameter:
 
