@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["kiyoto@treasure-data.com"]
   spec.summary       = %q{Fluentd plugin to suppor Logstash-inspired Grok format for parsing logs}
   spec.homepage      = "https://github.com/kiyoto/fluent-plugin-grok-parser"
-  spec.license       = "Apache License, Version 2.0"
+  spec.license       = "Apache-2.0"
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
