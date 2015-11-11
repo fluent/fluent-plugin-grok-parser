@@ -82,8 +82,8 @@ module Fluent
                                 end
           pattern.sub!(m[0]) do |s| replacement_pattern end
         end
-      
-        pattern 
+
+        pattern
       end
 
       def parse(text)
