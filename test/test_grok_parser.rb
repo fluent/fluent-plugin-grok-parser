@@ -15,22 +15,6 @@ def str2time(str_time, format = nil)
 end
 
 class GrokParserTest < ::Test::Unit::TestCase
-  def internal_test_grok_pattern(grok_pattern, text, expected_time, expected_record, options = {})
-    parser = TextParser::GrokParser.new
-    parser.configure(Config::Element.new('ROOT', '', {"grok_pattern" => grok_pattern}.merge(options), []))
-
-    # for the old, return based API
-    time, record = parser.parse(text)
-    assert_equal(expected_time, time) if expected_time
-    assert_equal(expected_record, record)
-
-    # for the new API
-    parser.parse(text) {|time, record|
-      assert_equal(expected_time, time) if expected_time
-      assert_equal(expected_record, record)
-    }
-  end
-
   def test_call_for_timestamp
     internal_test_grok_pattern('%{TIMESTAMP_ISO8601:time}', 'Some stuff at 2014-01-01T00:00:00+0900',
                                str2time('2014-01-01T00:00:00+0900'), {})
@@ -84,5 +68,23 @@ class GrokParserTest < ::Test::Unit::TestCase
     ensure
       File.delete(pattern_file.path)
     end
+  end
+
+  private
+
+  def internal_test_grok_pattern(grok_pattern, text, expected_time, expected_record, options = {})
+    parser = TextParser::GrokParser.new
+    parser.configure(Config::Element.new('ROOT', '', {"grok_pattern" => grok_pattern}.merge(options), []))
+
+    # for the old, return based API
+    time, record = parser.parse(text)
+    assert_equal(expected_time, time) if expected_time
+    assert_equal(expected_record, record)
+
+    # for the new API
+    parser.parse(text) {|time, record|
+      assert_equal(expected_time, time) if expected_time
+      assert_equal(expected_record, record)
+    }
   end
 end
