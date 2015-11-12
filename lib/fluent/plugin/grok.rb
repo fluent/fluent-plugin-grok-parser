@@ -20,6 +20,10 @@ module Fluent
       @parsers = []
       @multiline_mode = false
       @conf = conf
+      if @conf['multiline_start_regexp']
+        @multiline_mode = true
+        @multiline_start_regexp = Regexp.compile(@conf['multiline_start_regexp'][1..-2])
+      end
     end
 
     def add_patterns_from_file(path)
@@ -38,11 +42,6 @@ module Fluent
         grok_confs.each do |grok_conf|
           @parsers << expand_pattern_expression(grok_conf['pattern'], grok_conf)
         end
-      end
-
-      if @conf['multiline_start_regexp']
-        @multiline_mode = true
-        @multiline_start_regexp = Regexp.compile(@conf['multiline_start_regexp'][1..-2])
       end
     end
 
