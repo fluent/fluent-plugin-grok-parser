@@ -27,7 +27,7 @@ class GrokParserTest < ::Test::Unit::TestCase
   end
 
   def test_call_for_grok_pattern_not_found
-    assert_raise TextParser::GrokPatternNotFoundError do
+    assert_raise Grok::GrokPatternNotFoundError do
       internal_test_grok_pattern('%{THIS_PATTERN_DOESNT_EXIST}', 'Some stuff at somewhere', nil, {})
     end
   end
