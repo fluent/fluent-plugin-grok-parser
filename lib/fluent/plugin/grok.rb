@@ -20,8 +20,10 @@ module Fluent
       @parsers = []
       @multiline_mode = false
       @conf = conf
-      if @conf['multiline_start_regexp']
+      if plugin.instance_of?(Fluent::TextParser::MultilineGrokParser)
         @multiline_mode = true
+      end
+      if @conf['multiline_start_regexp']
         @multiline_start_regexp = Regexp.compile(@conf['multiline_start_regexp'][1..-2])
       end
     end
