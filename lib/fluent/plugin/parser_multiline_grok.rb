@@ -16,11 +16,11 @@ module Fluent
       end
 
       def has_firstline?
-        !!@multiline_start_regexp
+        true
       end
 
       def firstline?(text)
-        @multiline_start_regexp && !@multiline_start_regexp.match(text)
+        !@multiline_start_regexp.match(text)
       end
     end
   end
