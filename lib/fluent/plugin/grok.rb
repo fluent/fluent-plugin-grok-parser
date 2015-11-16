@@ -20,8 +20,10 @@ module Fluent
       @parsers = []
       @multiline_mode = false
       @conf = conf
-      if @conf['multiline_start_regexp']
+      if plugin.instance_of?(Fluent::TextParser::MultilineGrokParser)
         @multiline_mode = true
+      end
+      if @conf['multiline_start_regexp']
         @multiline_start_regexp = Regexp.compile(@conf['multiline_start_regexp'][1..-2])
       end
     end
@@ -39,8 +41,16 @@ module Fluent
         @parsers << expand_pattern_expression(@conf['grok_pattern'], @conf)
       else
         grok_confs = @conf.elements.select {|e| e.name == 'grok'}
-        grok_confs.each do |grok_conf|
-          @parsers << expand_pattern_expression(grok_conf['pattern'], grok_conf)
+        if @multiline_mode
+          patterns = grok_confs.map do |grok_conf|
+            expand_pattern(grok_conf['pattern'])
+          end
+          regexp = Regexp.new(patterns.join, Regexp::MULTILINE)
+          @parsers << TextParser::RegexpParser.new(regexp, @conf)
+        else
+          grok_confs.each do |grok_conf|
+            @parsers << expand_pattern_expression(grok_conf['pattern'], grok_conf)
+          end
         end
       end
     end
