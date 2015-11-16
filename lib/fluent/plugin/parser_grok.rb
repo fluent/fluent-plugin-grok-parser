@@ -13,7 +13,6 @@ module Fluent
       def initialize
         super
         @default_parser = NoneParser.new
-        @parsers = []
       end
 
       def configure(conf={})
