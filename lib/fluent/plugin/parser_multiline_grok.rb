@@ -22,6 +22,27 @@ module Fluent
       def firstline?(text)
         @multiline_start_regexp && !@multiline_start_regexp.match(text)
       end
+
+      def parse(text, &block)
+        if block_given?
+          @grok.parsers.each do |parser|
+            parser.parse(text) do |time, record|
+              if time and record
+                yield time, record
+                return
+              end
+            end
+          end
+        else
+          @grok.parsers.each do |parser|
+            parser.parse(text) do |time, record|
+              if time and record
+                return time, record
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
