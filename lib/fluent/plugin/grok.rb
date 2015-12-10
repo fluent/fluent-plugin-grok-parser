@@ -20,7 +20,7 @@ module Fluent
       @parsers = []
       @multiline_mode = false
       @conf = conf
-      if plugin.instance_of?(Fluent::TextParser::MultilineGrokParser)
+      if plugin.respond_to?(:firstline?)
         @multiline_mode = true
       end
       if @conf['multiline_start_regexp']
