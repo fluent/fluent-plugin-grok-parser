@@ -54,7 +54,7 @@ You can parse multiple line text.
   path /path/to/log
   format multiline_grok
   grok_pattern %{IP:ip_address}\n%{GREEDYDATA:message}
-  multiline_start_regex /^\s/
+  multiline_start_regexp /^\s/
   tag grokked_log
 </source>
 ```
@@ -75,7 +75,7 @@ You can use multiple grok patterns to parse your data.
 
 Fluentd accumulates data in the buffer forever to parse complete data when no pattern matches.
 
-You can use this parser without `multiline_start_regex` when you know your data structure perfectly.
+You can use this parser without `multiline_start_regexp` when you know your data structure perfectly.
 
 
 ## How to write Grok patterns
