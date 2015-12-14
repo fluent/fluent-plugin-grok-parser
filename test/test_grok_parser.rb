@@ -73,8 +73,7 @@ class GrokParserTest < ::Test::Unit::TestCase
   private
 
   def internal_test_grok_pattern(grok_pattern, text, expected_time, expected_record, options = {})
-    parser = TextParser::GrokParser.new
-    parser.configure(Config::Element.new('ROOT', '', {"grok_pattern" => grok_pattern}.merge(options), []))
+    parser = Fluent::Test::ParserTestDriver.new(TextParser::GrokParser).configure({"grok_pattern" => grok_pattern}.merge(options))
 
     # for the old, return based API
     time, record = parser.parse(text)

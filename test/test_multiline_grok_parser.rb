@@ -52,9 +52,6 @@ TEXT
   private
 
   def create_parser(conf)
-    parser = TextParser::MultilineGrokParser.new
-    io = StringIO.new(conf)
-    parser.configure(Config::Parser.parse(io, "fluent.conf"))
-    parser
+    Fluent::Test::ParserTestDriver.new(TextParser::MultilineGrokParser).configure(conf)
   end
 end
