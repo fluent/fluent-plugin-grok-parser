@@ -49,6 +49,17 @@ TEXT
     end
   end
 
+  def test_empty_range_text_in_text
+    text = " [b-a]"
+    conf = %[
+      grok_pattern %{HOSTNAME:hostname} %{GREEDYDATA:message}
+      multiline_start_regexp /^\s/
+    ]
+    d = create_driver(conf)
+
+    assert(d.instance.firstline?(text))
+  end
+
   private
 
   def create_driver(conf)

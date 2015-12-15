@@ -20,7 +20,7 @@ module Fluent
       end
 
       def firstline?(text)
-        @multiline_start_regexp && !@multiline_start_regexp.match(text)
+        @multiline_start_regexp && !!@grok.multiline_start_regexp.match(text)
       end
 
       def parse(text, &block)

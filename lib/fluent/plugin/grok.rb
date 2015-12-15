@@ -14,6 +14,7 @@ module Fluent
          \}/x
 
     attr_reader :parsers
+    attr_reader :multiline_start_regexp
 
     def initialize(plugin, conf)
       @pattern_map = {}
