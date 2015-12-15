@@ -19,9 +19,9 @@ MESSAGE
       grok_pattern %{HOSTNAME:hostname} %{GREEDYDATA:message}
       multiline_start_regexp /^\s/
     ]
-    parser = create_parser(conf)
+    d = create_driver(conf)
 
-    parser.parse(text) do |time, record|
+    d.parse(text) do |time, record|
       assert_equal({ "hostname" => "host1", "message" => message }, record)
     end
   end
@@ -36,7 +36,7 @@ TEXT
     conf = %[
        grok_pattern %{HOSTNAME:hostname} %{DATA:message1}\\n %{DATA:message2}\\n %{DATA:message3}\\nend
     ]
-    parser = create_parser(conf)
+    d = create_driver(conf)
 
     expected = {
       "hostname" => "host1",
@@ -44,14 +44,14 @@ TEXT
       "message2" => "message2",
       "message3" => "message3"
     }
-    parser.parse(text) do |time, record|
+    d.parse(text) do |time, record|
       assert_equal(expected, record)
     end
   end
 
   private
 
-  def create_parser(conf)
+  def create_driver(conf)
     Fluent::Test::ParserTestDriver.new(TextParser::MultilineGrokParser).configure(conf)
   end
 end
