@@ -4,8 +4,9 @@ module Fluent
   class TextParser
     class MultilineGrokParser < GrokParser
       Plugin.register_parser('multiline_grok', self)
-      config_param :multiline_start_regexp, :string, :default => nil
 
+      desc 'The regexp to match beginning of multiline'
+      config_param :multiline_start_regexp, :string, :default => nil
 
       def initialize
         super

@@ -6,8 +6,20 @@ module Fluent
 
     class GrokParser < Parser
       Plugin.register_parser('grok', self)
+
+      # For fluentd v0.12.16 or earlier
+      class << self
+        unless method_defined?(:desc)
+          def desc(description)
+          end
+        end
+      end
+
+      desc 'The format of the time field.'
       config_param :time_format, :string, :default => nil
+      desc 'The pattern of grok'
       config_param :grok_pattern, :string, :default => nil
+      desc 'Path to the file that includes custom grok patterns'
       config_param :custom_pattern_path, :string, :default => nil
 
       def initialize
