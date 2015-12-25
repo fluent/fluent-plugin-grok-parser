@@ -15,7 +15,7 @@ extracts the first IP address that matches in the log.
 
 ```aconf
 <source>
-  type tail
+  @type tail
   path /path/to/log
   format grok
   grok_pattern %{IP:ip_address}
@@ -27,7 +27,7 @@ extracts the first IP address that matches in the log.
 
 ```aconf
 <source>
-  type tail
+  @type tail
   path /path/to/log
   format grok
   <grok>
@@ -50,7 +50,7 @@ You can parse multiple line text.
 
 ```aconf
 <source>
-  type tail
+  @type tail
   path /path/to/log
   format multiline_grok
   grok_pattern %{IP:ip_address}\n%{GREEDYDATA:message}
@@ -63,7 +63,7 @@ You can use multiple grok patterns to parse your data.
 
 ```aconf
 <source>
-  type tail
+  @type tail
   path /path/to/log
   format multiline_grok
   <grok>
@@ -104,7 +104,7 @@ This is what the `custom_pattern_path` parameter is for.
 
 ```
 <source>
-  type tail
+  @type tail
   path /path/to/log
   format grok
   grok_pattern %{MY_SUPER_PATTERN}
@@ -153,7 +153,7 @@ Here is a sample config using the Grok parser with `in_tail` and the `types` par
 
 ```aconf
 <source>
-  type tail
+  @type tail
   path /path/to/log
   format grok
   grok_pattern %{INT:user_id} paid %{NUMBER:paid_amount}
