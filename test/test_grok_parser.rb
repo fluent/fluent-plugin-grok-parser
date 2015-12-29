@@ -15,6 +15,7 @@ def str2time(str_time, format = nil)
 end
 
 class GrokParserTest < ::Test::Unit::TestCase
+  class Timestamp < self
   def test_call_for_timestamp
     internal_test_grok_pattern('%{TIMESTAMP_ISO8601:time}', 'Some stuff at 2014-01-01T00:00:00+0900',
                                str2time('2014-01-01T00:00:00+0900'), {})
@@ -24,6 +25,7 @@ class GrokParserTest < ::Test::Unit::TestCase
                                str2time('Mon, 15 Aug 2005 15:52:01 +0000'), {})
     internal_test_grok_pattern('%{SYSLOGTIMESTAMP:time}', 'Some stuff at Aug 01 00:00:00',
                                str2time('Aug 01 00:00:00'), {})
+  end
   end
 
   def test_call_for_grok_pattern_not_found
