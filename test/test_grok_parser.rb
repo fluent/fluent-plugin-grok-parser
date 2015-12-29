@@ -16,13 +16,22 @@ end
 
 class GrokParserTest < ::Test::Unit::TestCase
   class Timestamp < self
-    def test_call_for_timestamp
+    def test_timestamp_iso8601
       internal_test_grok_pattern('%{TIMESTAMP_ISO8601:time}', 'Some stuff at 2014-01-01T00:00:00+0900',
                                  str2time('2014-01-01T00:00:00+0900'), {})
+    end
+
+    def test_datestamp_rfc822_with_zone
       internal_test_grok_pattern('%{DATESTAMP_RFC822:time}', 'Some stuff at Mon Aug 15 2005 15:52:01 UTC',
                                  str2time('Mon Aug 15 2005 15:52:01 UTC'), {})
+    end
+
+    def test_datestamp_rfc822_with_numeric_zone
       internal_test_grok_pattern('%{DATESTAMP_RFC2822:time}', 'Some stuff at Mon, 15 Aug 2005 15:52:01 +0000',
                                  str2time('Mon, 15 Aug 2005 15:52:01 +0000'), {})
+    end
+
+    def test_syslogtimestamp
       internal_test_grok_pattern('%{SYSLOGTIMESTAMP:time}', 'Some stuff at Aug 01 00:00:00',
                                  str2time('Aug 01 00:00:00'), {})
     end
