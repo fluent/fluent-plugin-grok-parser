@@ -99,6 +99,31 @@ class GrokParserTest < ::Test::Unit::TestCase
                                  'a|b|c|d', nil,
                                  {"message" => %w(a b c d)})
     end
+
+    def test_timestamp_iso8601
+      internal_test_grok_pattern('%{TIMESTAMP_ISO8601:stamp:time}', 'Some stuff at 2014-01-01T00:00:00+0900',
+                                 nil, {"stamp" => str2time('2014-01-01T00:00:00+0900')})
+    end
+
+    def test_datestamp_rfc822_with_zone
+      internal_test_grok_pattern('%{DATESTAMP_RFC822:stamp:time}', 'Some stuff at Mon Aug 15 2005 15:52:01 UTC',
+                                 nil, {"stamp" => str2time('Mon Aug 15 2005 15:52:01 UTC')})
+    end
+
+    def test_datestamp_rfc822_with_numeric_zone
+      internal_test_grok_pattern('%{DATESTAMP_RFC2822:stamp:time}', 'Some stuff at Mon, 15 Aug 2005 15:52:01 +0000',
+                                 nil, {"stamp" => str2time('Mon, 15 Aug 2005 15:52:01 +0000')})
+    end
+
+    def test_syslogtimestamp
+      internal_test_grok_pattern('%{SYSLOGTIMESTAMP:stamp:time}', 'Some stuff at Aug 01 00:00:00',
+                                 nil, {"stamp" => str2time('Aug 01 00:00:00')})
+    end
+
+    def test_timestamp_with_format
+      internal_test_grok_pattern('%{TIMESTAMP_ISO8601:stamp:time:%Y-%m-%d %H%M}', 'Some stuff at 2014-01-01 1000',
+                                 nil, {"stamp" => str2time('2014-01-01 10:00')})
+    end
   end
 
   private
