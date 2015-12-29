@@ -82,7 +82,7 @@ class GrokParserTest < ::Test::Unit::TestCase
   end
 
   class OptionalType < self
-    def test_optional_type
+    def test_simple
       internal_test_grok_pattern('%{INT:user_id:integer} paid %{NUMBER:paid_amount:float}',
                                  '12345 paid 6789.10', nil,
                                  {"user_id" => 12345, "paid_amount" => 6789.1 })
