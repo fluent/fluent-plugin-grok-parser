@@ -12,7 +12,7 @@ module Fluent
              (?::(?<subname>[@\[\]A-z0-9_:.-]+?)
                   (?::(?<type>(?:string|bool|integer|float|
                                  time(?::.+)?|
-                                 array(?:.)?)))?)?
+                                 array(?::.)?)))?)?
            )
          \}/x
 
