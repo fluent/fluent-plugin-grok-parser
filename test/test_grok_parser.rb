@@ -87,6 +87,18 @@ class GrokParserTest < ::Test::Unit::TestCase
                                  '12345 paid 6789.10', nil,
                                  {"user_id" => 12345, "paid_amount" => 6789.1 })
     end
+
+    def test_array
+      internal_test_grok_pattern('%{GREEDYDATA:message:array}',
+                                 'a,b,c,d', nil,
+                                 {"message" => %w(a b c d)})
+    end
+
+    def test_array_with_delimiter
+      internal_test_grok_pattern('%{GREEDYDATA:message:array:|}',
+                                 'a|b|c|d', nil,
+                                 {"message" => %w(a b c d)})
+    end
   end
 
   private
