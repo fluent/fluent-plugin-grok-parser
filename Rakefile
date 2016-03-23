@@ -13,4 +13,13 @@ Rake::TestTask.new(:base_test) do |t|
   #t.warning = true
 end
 
+desc 'Import patterns from submodules'
+task 'patterns:import' do
+  `git submodule --quiet foreach pwd`.split($\).each do |submodule_path|
+    Dir.glob(File.join(submodule_path, "patterns/*")) do |pattern|
+      cp(pattern, "patterns/", verbose: true)
+    end
+  end
+end
+
 task :default => [:test, :build]
