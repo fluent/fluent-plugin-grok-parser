@@ -77,7 +77,7 @@ module Fluent
         m = PATTERN_RE.match(pattern)
         break unless m
         curr_pattern = @pattern_map[m["pattern"]]
-        raise GrokPatternNotFoundError unless curr_pattern
+        raise GrokPatternNotFoundError, "grok pattern not found: #{pattern}" unless curr_pattern
         if m["subname"]
           replacement_pattern = "(?<#{m["subname"]}>#{curr_pattern})"
           type_map[m["subname"]] = m["type"] || "string"
