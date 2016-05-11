@@ -63,6 +63,7 @@ class GrokParserTest < ::Test::Unit::TestCase
                                   "referrer"    => "\"-\"",
                                   "agent"       => "\"Opera/12.0\""
                                 },
+                                "time_key" => "timestamp",
                                 "time_format" => "%d/%b/%Y:%H:%M:%S %z"
                               )
   end
