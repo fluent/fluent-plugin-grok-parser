@@ -42,7 +42,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
     ]
     block_config = %[
       <grok>
-        pattern ${GREEDYDATA:message}
+        pattern %{GREEDYDATA:message}
       </grok>
     ]
 
