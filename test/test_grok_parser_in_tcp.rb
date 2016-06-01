@@ -3,6 +3,20 @@ require 'fluent/test'
 require 'fluent/plugin/in_tcp'
 
 class TcpInputWithGrokTest < Test::Unit::TestCase
+  if defined?(ServerEngine)
+    class << self
+      def startup
+        socket_manager_path = ServerEngine::SocketManager::Server.generate_path
+        @server = ServerEngine::SocketManager::Server.open(socket_manager_path)
+        ENV['SERVERENGINE_SOCKETMANAGER_PATH'] = socket_manager_path.to_s
+      end
+
+      def shutdown
+        @server.close
+      end
+    end
+  end
+
   def setup
     Fluent::Test.setup
   end
