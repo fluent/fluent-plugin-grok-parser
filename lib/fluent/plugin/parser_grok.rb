@@ -30,11 +30,11 @@ module Fluent
         end
 
         if @custom_pattern_path
-          if Dir.exists? @custom_pattern_path
+          if Dir.exist? @custom_pattern_path
             Dir.glob(@custom_pattern_path + '/*') do |pattern_file_path|
               @grok.add_patterns_from_file(pattern_file_path)
             end
-          elsif File.exists? @custom_pattern_path
+          elsif File.exist? @custom_pattern_path
             @grok.add_patterns_from_file(@custom_pattern_path)
           end
         end
