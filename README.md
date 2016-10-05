@@ -17,9 +17,23 @@ extracts the first IP address that matches in the log.
 <source>
   @type tail
   path /path/to/log
+  tag grokked_log
+  <parse>
+    @type grok
+    grok_pattern %{IP:ip_address}
+  </parse>
+</source>
+```
+
+You can also use Fluentd v0.12 style:
+
+```aconf
+<source>
+  @type tail
+  path /path/to/log
+  tag grokked_log
   format grok
   grok_pattern %{IP:ip_address}
-  tag grokked_log
 </source>
 ```
 
@@ -29,6 +43,30 @@ extracts the first IP address that matches in the log.
 <source>
   @type tail
   path /path/to/log
+  tag grokked_log
+  <parse>
+    @type grok
+    <grok>
+      pattern %{COMBINEDAPACHELOG}
+      time_format "%d/%b/%Y:%H:%M:%S %z"
+    </grok>
+    <grok>
+      pattern %{IP:ip_address}
+    </grok>
+    <grok>
+      pattern %{GREEDYDATA:message}
+    </grok>
+  </parse>
+</source>
+```
+
+You can also use Fluentd v0.12 style:
+
+```aconf
+<source>
+  @type tail
+  path /path/to/log
+  tag grokked_log
   format grok
   <grok>
     pattern %{COMBINEDAPACHELOG}
@@ -40,13 +78,27 @@ extracts the first IP address that matches in the log.
   <grok>
     pattern %{GREEDYDATA:message}
   </grok>
-  tag grokked_log
 </source>
 ```
 
 ### Multiline support
 
 You can parse multiple line text.
+
+```aconf
+<source>
+  @type tail
+  path /path/to/log
+  tag grokked_log
+  <parse>
+    @type multiline_grok
+    grok_pattern %{IP:ip_address}%{GREEDYDATA:message}
+    multiline_start_regexp /^[^\s]/
+  </parse>
+</source>
+```
+
+You can also use Fluentd v0.12 style:
 
 ```aconf
 <source>
@@ -60,6 +112,22 @@ You can parse multiple line text.
 ```
 
 You can use multiple grok patterns to parse your data.
+
+```aconf
+<source>
+  @type tail
+  path /path/to/log
+  tag grokked_log
+  <parse>
+    @type multiline_grok
+    <grok>
+      pattern Started %{WORD:verb} "%{URIPATH:pathinfo}" for %{IP:ip} at %{TIMESTAMP_ISO8601:timestamp}\nProcessing by %{WORD:controller}#%{WORD:action} as %{WORD:format}%{DATA:message}Completed %{NUMBER:response} %{WORD} in %{NUMBER:elapsed} (%{DATA:elapsed_details})
+    </grok>
+  </parse>
+</source>
+```
+
+You can also use Fluentd v0.12 style:
 
 ```aconf
 <source>
@@ -105,9 +173,11 @@ This is what the `custom_pattern_path` parameter is for.
 <source>
   @type tail
   path /path/to/log
-  format grok
-  grok_pattern %{MY_SUPER_PATTERN}
-  custom_pattern_path /path/to/my_pattern
+  <parse>
+    @type grok
+    grok_pattern %{MY_SUPER_PATTERN}
+    custom_pattern_path /path/to/my_pattern
+  </parse>
 </source>
 ```
 
