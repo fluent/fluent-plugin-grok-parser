@@ -1,9 +1,9 @@
 require 'fluent/plugin/parser_grok'
 
 module Fluent
-  class TextParser
+  module Plugin
     class MultilineGrokParser < GrokParser
-      Plugin.register_parser('multiline_grok', self)
+      Fluent::Plugin.register_parser('multiline_grok', self)
 
       desc 'The regexp to match beginning of multiline'
       config_param :multiline_start_regexp, :string, :default => nil

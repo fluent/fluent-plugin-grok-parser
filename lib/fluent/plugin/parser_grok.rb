@@ -1,11 +1,11 @@
 require "fluent/plugin/grok"
 
 module Fluent
-  class TextParser
+  module Plugin
     class GrokPatternNotFoundError < Exception; end
 
     class GrokParser < Parser
-      Plugin.register_parser('grok', self)
+      Fluent::Plugin.register_parser('grok', self)
 
       # For fluentd v0.12.16 or earlier
       class << self
