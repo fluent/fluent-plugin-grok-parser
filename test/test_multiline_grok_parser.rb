@@ -21,7 +21,7 @@ MESSAGE
     ]
     d = create_driver(conf)
 
-    d.parse(text) do |time, record|
+    d.instance.parse(text) do |_time, record|
       assert_equal({ "hostname" => "host1", "message" => message }, record)
     end
   end
@@ -44,7 +44,7 @@ TEXT
       "message2" => "message2",
       "message3" => "message3"
     }
-    d.parse(text) do |time, record|
+    d.instance.parse(text) do |_time, record|
       assert_equal(expected, record)
     end
   end
@@ -63,6 +63,6 @@ TEXT
   private
 
   def create_driver(conf)
-    Fluent::Test::ParserTestDriver.new(TextParser::MultilineGrokParser).configure(conf)
+    Fluent::Test::Driver::Parser.new(Fluent::Plugin::MultilineGrokParser).configure(conf)
   end
 end

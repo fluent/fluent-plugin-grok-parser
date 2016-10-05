@@ -1,3 +1,5 @@
+require "fluent/test/driver/input"
+require "fluent/test/driver/parser"
 
 def unused_port
   s = TCPServer.open(0)

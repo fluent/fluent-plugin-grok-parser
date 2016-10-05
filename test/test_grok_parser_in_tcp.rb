@@ -35,7 +35,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
   ]
 
   def create_driver(conf)
-    Fluent::Test::InputTestDriver.new(Fluent::TcpInput).configure(conf)
+    Fluent::Test::Driver::Input.new(Fluent::TcpInput).configure(conf)
   end
 
   def test_configure
@@ -83,22 +83,21 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
 
   def internal_test_grok(conf, tests)
     d = create_driver(BASE_CONFIG + conf)
-    d.run do
+    d.run(expect_emits: tests.size) do
       tests.each {|test|
         TCPSocket.open('127.0.0.1', PORT) do |s|
           s.send(test['msg'], 0)
         end
       }
-      sleep 1
     end
 
-    compare_test_result(d.emits, tests)
+    compare_test_result(d.events, tests)
   end
 
-  def compare_test_result(emits, tests)
-    assert_equal(2, emits.size)
-    emits.each_index {|i|
-      assert_equal(tests[i]['expected'], emits[i][2]['message'])
+  def compare_test_result(events, tests)
+    assert_equal(2, events.size)
+    events.each_index {|i|
+      assert_equal(tests[i]['expected'], events[i][2]['message'])
     }
   end
 end
