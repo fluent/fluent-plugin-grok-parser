@@ -50,27 +50,16 @@ module Fluent
         @grok.setup
       end
 
-      def parse(text, &block)
-        if block_given?
-          @grok.parsers.each do |parser|
-            parser.parse(text) do |time, record|
-              if time and record
-                yield time, record
-                return
-              end
+      def parse(text)
+        @grok.parsers.each do |parser|
+          parser.parse(text) do |time, record|
+            if time and record
+              yield time, record
+              return
             end
           end
-          yield @default_parser.parse(text)
-        else
-          @grok.parsers.each do |parser|
-            parser.parse(text) do |time, record|
-              if time and record
-                return time, record
-              end
-            end
-          end
-          return @default_parser.parse(text)
         end
+        yield @default_parser.parse(text)
       end
     end
   end
