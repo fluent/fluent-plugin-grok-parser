@@ -169,7 +169,7 @@ Please see `patterns/*` for the patterns that are supported out of the box.
 You can add your own Grok patterns by creating your own Grok file and telling the plugin to read it.
 This is what the `custom_pattern_path` parameter is for.
 
-```
+```aconf
 <source>
   @type tail
   path /path/to/log
