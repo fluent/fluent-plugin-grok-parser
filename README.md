@@ -232,6 +232,8 @@ Here is a sample config using the Grok parser with `in_tail` and the `types` par
 
 If you want to use this plugin with Fluentd v0.12.x or earlier, you can use this plugin version v1.0.0.
 
+See also: [Plugin Management | Fluentd](http://docs.fluentd.org/articles/plugin-management#ldquomdashgemfilerdquo-option)
+
 ## License
 
 Apache 2.0 License
