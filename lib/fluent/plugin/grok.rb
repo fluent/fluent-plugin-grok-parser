@@ -67,7 +67,7 @@ module Fluent
     rescue GrokPatternNotFoundError => e
       raise e
     rescue => e
-      $log.error e.backtrace.join("\n")
+      $log.error(error: e)
     end
 
     def expand_pattern(pattern)
