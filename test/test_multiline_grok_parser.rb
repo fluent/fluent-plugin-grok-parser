@@ -1,3 +1,4 @@
+require "helper"
 require "fluent/plugin/parser_multiline_grok"
 require "fluent/config/parser"
 

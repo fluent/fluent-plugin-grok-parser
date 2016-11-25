@@ -1,5 +1,4 @@
 require "helper"
-require "fluent/test"
 require "fluent/plugin/in_tcp"
 
 class TcpInputWithGrokTest < Test::Unit::TestCase

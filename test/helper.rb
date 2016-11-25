@@ -1,5 +1,9 @@
+require "fluent/test"
+require "fluent/test/helpers"
 require "fluent/test/driver/input"
 require "fluent/test/driver/parser"
+
+Test::Unit::TestCase.include(Fluent::Test::Helpers)
 
 def unused_port
   s = TCPServer.open(0)
