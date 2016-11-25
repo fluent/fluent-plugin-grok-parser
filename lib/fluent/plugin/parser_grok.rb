@@ -2,8 +2,6 @@ require "fluent/plugin/grok"
 
 module Fluent
   module Plugin
-    class GrokPatternNotFoundError < Exception; end
-
     class GrokParser < Parser
       Fluent::Plugin.register_parser('grok', self)
 
