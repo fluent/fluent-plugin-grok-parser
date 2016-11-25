@@ -27,26 +27,26 @@ module Fluent
       if plugin.respond_to?(:firstline?)
         @multiline_mode = true
       end
-      if @conf['multiline_start_regexp']
-        @multiline_start_regexp = Regexp.compile(@conf['multiline_start_regexp'][1..-2])
+      if @conf["multiline_start_regexp"]
+        @multiline_start_regexp = Regexp.compile(@conf["multiline_start_regexp"][1..-2])
       end
     end
 
     def add_patterns_from_file(path)
       File.new(path).each_line do |line|
-        next if line[0] == '#' || /^$/ =~ line
+        next if line[0] == "#" || /^$/ =~ line
         name, pat = line.chomp.split(/\s+/, 2)
         @pattern_map[name] = pat
       end
     end
 
     def setup
-      if @conf['grok_pattern']
-        @parsers << expand_pattern_expression(@conf['grok_pattern'], @conf)
+      if @conf["grok_pattern"]
+        @parsers << expand_pattern_expression(@conf["grok_pattern"], @conf)
       else
-        grok_confs = @conf.elements.select {|e| e.name == 'grok'}
+        grok_confs = @conf.elements.select {|e| e.name == "grok"}
         grok_confs.each do |grok_conf|
-          @parsers << expand_pattern_expression(grok_conf['pattern'], grok_conf)
+          @parsers << expand_pattern_expression(grok_conf["pattern"], grok_conf)
         end
       end
     end

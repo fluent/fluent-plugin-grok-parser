@@ -9,7 +9,7 @@ def unused_port
 end
 
 def ipv6_enabled?
-  require 'socket'
+  require "socket"
 
   begin
     TCPServer.open("::1", 0)

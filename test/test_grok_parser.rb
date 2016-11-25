@@ -1,7 +1,7 @@
-require 'fluent/test'
-require 'fluent/parser'
-require 'fluent/plugin/parser_grok'
-require 'tempfile'
+require "fluent/test"
+require "fluent/parser"
+require "fluent/plugin/parser_grok"
+require "tempfile"
 
 
 include Fluent
@@ -17,40 +17,40 @@ end
 class GrokParserTest < ::Test::Unit::TestCase
   class Timestamp < self
     def test_timestamp_iso8601
-      internal_test_grok_pattern('%{TIMESTAMP_ISO8601:time}', 'Some stuff at 2014-01-01T00:00:00+0900',
-                                 str2time('2014-01-01T00:00:00+0900'), {})
+      internal_test_grok_pattern("%{TIMESTAMP_ISO8601:time}", "Some stuff at 2014-01-01T00:00:00+0900",
+                                 str2time("2014-01-01T00:00:00+0900"), {})
     end
 
     def test_datestamp_rfc822_with_zone
-      internal_test_grok_pattern('%{DATESTAMP_RFC822:time}', 'Some stuff at Mon Aug 15 2005 15:52:01 UTC',
-                                 str2time('Mon Aug 15 2005 15:52:01 UTC'), {})
+      internal_test_grok_pattern("%{DATESTAMP_RFC822:time}", "Some stuff at Mon Aug 15 2005 15:52:01 UTC",
+                                 str2time("Mon Aug 15 2005 15:52:01 UTC"), {})
     end
 
     def test_datestamp_rfc822_with_numeric_zone
-      internal_test_grok_pattern('%{DATESTAMP_RFC2822:time}', 'Some stuff at Mon, 15 Aug 2005 15:52:01 +0000',
-                                 str2time('Mon, 15 Aug 2005 15:52:01 +0000'), {})
+      internal_test_grok_pattern("%{DATESTAMP_RFC2822:time}", "Some stuff at Mon, 15 Aug 2005 15:52:01 +0000",
+                                 str2time("Mon, 15 Aug 2005 15:52:01 +0000"), {})
     end
 
     def test_syslogtimestamp
-      internal_test_grok_pattern('%{SYSLOGTIMESTAMP:time}', 'Some stuff at Aug 01 00:00:00',
-                                 str2time('Aug 01 00:00:00'), {})
+      internal_test_grok_pattern("%{SYSLOGTIMESTAMP:time}", "Some stuff at Aug 01 00:00:00",
+                                 str2time("Aug 01 00:00:00"), {})
     end
   end
 
   def test_call_for_grok_pattern_not_found
     assert_raise Grok::GrokPatternNotFoundError do
-      internal_test_grok_pattern('%{THIS_PATTERN_DOESNT_EXIST}', 'Some stuff at somewhere', nil, {})
+      internal_test_grok_pattern("%{THIS_PATTERN_DOESNT_EXIST}", "Some stuff at somewhere", nil, {})
     end
   end
 
   def test_call_for_multiple_fields
-    internal_test_grok_pattern('%{MAC:mac_address} %{IP:ip_address}', 'this.wont.match DEAD.BEEF.1234 127.0.0.1', nil,
+    internal_test_grok_pattern("%{MAC:mac_address} %{IP:ip_address}", "this.wont.match DEAD.BEEF.1234 127.0.0.1", nil,
                                {"mac_address" => "DEAD.BEEF.1234", "ip_address" => "127.0.0.1"})
   end
 
   def test_call_for_complex_pattern
-    internal_test_grok_pattern('%{COMBINEDAPACHELOG}', '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
-                                str2time('28/Feb/2013:12:00:00 +0900', '%d/%b/%Y:%H:%M:%S %z'),
+    internal_test_grok_pattern("%{COMBINEDAPACHELOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
+                                str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
                                 {
                                   "clientip"    => "127.0.0.1",
                                   "ident"       => "192.168.0.1",
@@ -73,7 +73,7 @@ class GrokParserTest < ::Test::Unit::TestCase
     pattern_file.write("MY_AWESOME_PATTERN %{GREEDYDATA:message}\n")
     pattern_file.close
     begin
-      internal_test_grok_pattern('%{MY_AWESOME_PATTERN:message}', 'this is awesome',
+      internal_test_grok_pattern("%{MY_AWESOME_PATTERN:message}", "this is awesome",
                                  nil, {"message" => "this is awesome"},
                                  "custom_pattern_path" => pattern_file.path
                                 )
@@ -84,46 +84,46 @@ class GrokParserTest < ::Test::Unit::TestCase
 
   class OptionalType < self
     def test_simple
-      internal_test_grok_pattern('%{INT:user_id:integer} paid %{NUMBER:paid_amount:float}',
-                                 '12345 paid 6789.10', nil,
+      internal_test_grok_pattern("%{INT:user_id:integer} paid %{NUMBER:paid_amount:float}",
+                                 "12345 paid 6789.10", nil,
                                  {"user_id" => 12345, "paid_amount" => 6789.1 })
     end
 
     def test_array
-      internal_test_grok_pattern('%{GREEDYDATA:message:array}',
-                                 'a,b,c,d', nil,
+      internal_test_grok_pattern("%{GREEDYDATA:message:array}",
+                                 "a,b,c,d", nil,
                                  {"message" => %w(a b c d)})
     end
 
     def test_array_with_delimiter
-      internal_test_grok_pattern('%{GREEDYDATA:message:array:|}',
-                                 'a|b|c|d', nil,
+      internal_test_grok_pattern("%{GREEDYDATA:message:array:|}",
+                                 "a|b|c|d", nil,
                                  {"message" => %w(a b c d)})
     end
 
     def test_timestamp_iso8601
-      internal_test_grok_pattern('%{TIMESTAMP_ISO8601:stamp:time}', 'Some stuff at 2014-01-01T00:00:00+0900',
-                                 nil, {"stamp" => str2time('2014-01-01T00:00:00+0900')})
+      internal_test_grok_pattern("%{TIMESTAMP_ISO8601:stamp:time}", "Some stuff at 2014-01-01T00:00:00+0900",
+                                 nil, {"stamp" => str2time("2014-01-01T00:00:00+0900")})
     end
 
     def test_datestamp_rfc822_with_zone
-      internal_test_grok_pattern('%{DATESTAMP_RFC822:stamp:time}', 'Some stuff at Mon Aug 15 2005 15:52:01 UTC',
-                                 nil, {"stamp" => str2time('Mon Aug 15 2005 15:52:01 UTC')})
+      internal_test_grok_pattern("%{DATESTAMP_RFC822:stamp:time}", "Some stuff at Mon Aug 15 2005 15:52:01 UTC",
+                                 nil, {"stamp" => str2time("Mon Aug 15 2005 15:52:01 UTC")})
     end
 
     def test_datestamp_rfc822_with_numeric_zone
-      internal_test_grok_pattern('%{DATESTAMP_RFC2822:stamp:time}', 'Some stuff at Mon, 15 Aug 2005 15:52:01 +0000',
-                                 nil, {"stamp" => str2time('Mon, 15 Aug 2005 15:52:01 +0000')})
+      internal_test_grok_pattern("%{DATESTAMP_RFC2822:stamp:time}", "Some stuff at Mon, 15 Aug 2005 15:52:01 +0000",
+                                 nil, {"stamp" => str2time("Mon, 15 Aug 2005 15:52:01 +0000")})
     end
 
     def test_syslogtimestamp
-      internal_test_grok_pattern('%{SYSLOGTIMESTAMP:stamp:time}', 'Some stuff at Aug 01 00:00:00',
-                                 nil, {"stamp" => str2time('Aug 01 00:00:00')})
+      internal_test_grok_pattern("%{SYSLOGTIMESTAMP:stamp:time}", "Some stuff at Aug 01 00:00:00",
+                                 nil, {"stamp" => str2time("Aug 01 00:00:00")})
     end
 
     def test_timestamp_with_format
-      internal_test_grok_pattern('%{TIMESTAMP_ISO8601:stamp:time:%Y-%m-%d %H%M}', 'Some stuff at 2014-01-01 1000',
-                                 nil, {"stamp" => str2time('2014-01-01 10:00')})
+      internal_test_grok_pattern("%{TIMESTAMP_ISO8601:stamp:time:%Y-%m-%d %H%M}", "Some stuff at 2014-01-01 1000",
+                                 nil, {"stamp" => str2time("2014-01-01 10:00")})
     end
   end
 

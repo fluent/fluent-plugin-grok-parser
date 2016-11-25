@@ -1,6 +1,6 @@
-require 'helper'
-require 'fluent/test'
-require 'fluent/plugin/in_tcp'
+require "helper"
+require "fluent/test"
+require "fluent/plugin/in_tcp"
 
 class TcpInputWithGrokTest < Test::Unit::TestCase
   if defined?(ServerEngine)
@@ -8,7 +8,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
       def startup
         socket_manager_path = ServerEngine::SocketManager::Server.generate_path
         @server = ServerEngine::SocketManager::Server.open(socket_manager_path)
-        ENV['SERVERENGINE_SOCKETMANAGER_PATH'] = socket_manager_path.to_s
+        ENV["SERVERENGINE_SOCKETMANAGER_PATH"] = socket_manager_path.to_s
       end
 
       def shutdown
@@ -39,8 +39,8 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
   end
 
   def test_configure
-    configs = {'127.0.0.1' => CONFIG}
-    configs.merge!('::1' => IPv6_CONFIG) if ipv6_enabled?
+    configs = {"127.0.0.1" => CONFIG}
+    configs.merge!("::1" => IPv6_CONFIG) if ipv6_enabled?
 
     configs.each_pair { |k, v|
       d = create_driver(v)
@@ -52,8 +52,8 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
 
   def test_grok_pattern
     tests = [
-      {'msg' => "tcptest1\n", 'expected' => 'tcptest1'},
-      {'msg' => "tcptest2\n", 'expected' => 'tcptest2'},
+      {"msg" => "tcptest1\n", "expected" => "tcptest1"},
+      {"msg" => "tcptest2\n", "expected" => "tcptest2"},
     ]
     block_config = %[
       <grok>
@@ -61,14 +61,14 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
       </grok>
     ]
 
-    internal_test_grok('grok_pattern %{GREEDYDATA:message}', tests)
+    internal_test_grok("grok_pattern %{GREEDYDATA:message}", tests)
     internal_test_grok(block_config, tests)
   end
 
   def test_grok_multi_patterns
     tests = [
-      {'msg' => "Current time is 2014-01-01T00:00:00+0900\n", 'expected' => '2014-01-01T00:00:00+0900'},
-      {'msg' => "The first word matches\n", 'expected' => 'The'}
+      {"msg" => "Current time is 2014-01-01T00:00:00+0900\n", "expected" => "2014-01-01T00:00:00+0900"},
+      {"msg" => "The first word matches\n", "expected" => "The"}
     ]
     block_config = %[
       <grok>
@@ -85,8 +85,8 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
     d = create_driver(BASE_CONFIG + conf)
     d.run(expect_emits: tests.size) do
       tests.each {|test|
-        TCPSocket.open('127.0.0.1', PORT) do |s|
-          s.send(test['msg'], 0)
+        TCPSocket.open("127.0.0.1", PORT) do |s|
+          s.send(test["msg"], 0)
         end
       }
     end
@@ -97,7 +97,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
   def compare_test_result(events, tests)
     assert_equal(2, events.size)
     events.each_index {|i|
-      assert_equal(tests[i]['expected'], events[i][2]['message'])
+      assert_equal(tests[i]["expected"], events[i][2]["message"])
     }
   end
 end

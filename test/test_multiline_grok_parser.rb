@@ -1,7 +1,7 @@
-require 'fluent/plugin/parser_multiline_grok'
-require 'fluent/config/parser'
+require "fluent/plugin/parser_multiline_grok"
+require "fluent/config/parser"
 
-require 'stringio'
+require "stringio"
 
 class MultilineGrokParserTest < Test::Unit::TestCase
   def test_multiline
