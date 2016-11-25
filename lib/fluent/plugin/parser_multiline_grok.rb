@@ -6,7 +6,7 @@ module Fluent
       Fluent::Plugin.register_parser("multiline_grok", self)
 
       desc "The regexp to match beginning of multiline"
-      config_param :multiline_start_regexp, :string, :default => nil
+      config_param :multiline_start_regexp, :string, default: nil
 
       def initialize
         super
