@@ -8,7 +8,7 @@ module Fluent
       desc "The format of the time field."
       config_param :time_format, :string, default: nil
       desc "The pattern of grok"
-      config_param :grok_pattern, :string, default: nil
+      config_param :grok_pattern, :string, default: nil, deprecated: true
       desc "Path to the file that includes custom grok patterns"
       config_param :custom_pattern_path, :string, default: nil
 
