@@ -56,14 +56,14 @@ module Fluent
     def expand_pattern_expression(grok_pattern, conf)
       regexp, types = expand_pattern(grok_pattern)
       $log.info "Expanded the pattern #{conf['grok_pattern']} into #{regexp}"
-      options = nil
-      if @multiline_mode
-        options = Regexp::MULTILINE
-      end
       unless types.empty?
         conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
       end
-      TextParser::RegexpParser.new(Regexp.new(regexp, options), conf)
+      _conf = conf.merge("expression" => regexp, "multiline" => @multiline_mode)
+      config = Fluent::Config::Element.new("parse", nil, _conf, [])
+      parser = Fluent::Plugin::RegexpParser.new
+      parser.configure(config)
+      parser
     rescue GrokPatternNotFoundError => e
       raise e
     rescue => e
