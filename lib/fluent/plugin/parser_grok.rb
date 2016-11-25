@@ -49,7 +49,9 @@ module Fluent
             end
           end
         end
-        yield @default_parser.parse(text)
+        @default_parser.parse(text) do |time, record|
+          yield time, record
+        end
       end
     end
   end
