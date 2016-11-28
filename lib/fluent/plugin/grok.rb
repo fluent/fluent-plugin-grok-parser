@@ -33,7 +33,7 @@ module Fluent
     end
 
     def add_patterns_from_file(path)
-      File.new(path).each_line do |line|
+      File.open(path, "r").each_line do |line|
         next if line[0] == "#" || /^$/ =~ line
         name, pat = line.chomp.split(/\s+/, 2)
         @pattern_map[name] = pat
