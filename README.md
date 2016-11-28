@@ -161,7 +161,46 @@ Path to the file that includes custom grok patterns
 
 **grok_failure_key**
 
-The key has grok failure reason.
+The key has grok failure reason. Default is `nil`.
+
+```aconf
+<source>
+  @type dummy
+  @label @dummy
+  dummy [
+    { "message1": "no grok pattern matched!", "prog": "foo" },
+    { "message1": "/", "prog": "bar" }
+  ]
+  tag dummy.log
+</source>
+
+<label @dummy>
+  <filter>
+    @type parser
+    key_name message1
+    reserve_data true
+    reserve_time true
+    <parse>
+      @type grok
+      grok_failure_key grokfailure
+      <grok>
+        pattern %{PATH:path}
+      </grok>
+    </parse>
+  </filter>
+  <match dummy.log>
+    @type stdout
+  </match>
+</label>
+```
+
+This generates following events:
+
+```
+2016-11-28 13:07:08.009131727 +0900 dummy.log: {"message1":"no grok pattern matched!","prog":"foo","message":"no grok pattern matched!","grokfailure":"No grok pattern matched"}
+2016-11-28 13:07:09.010400923 +0900 dummy.log: {"message1":"/","prog":"bar","path":"/"}
+```
+
 
 **grok/pattern**
 
