@@ -11,6 +11,8 @@ module Fluent
       config_param :grok_pattern, :string, default: nil
       desc "Path to the file that includes custom grok patterns"
       config_param :custom_pattern_path, :string, default: nil
+      desc "The key has grok failure reason"
+      config_param :grok_failure_key, :string, default: nil
 
       def initialize
         super
@@ -50,6 +52,7 @@ module Fluent
           end
         end
         @default_parser.parse(text) do |time, record|
+          record[@grok_failure_key] = "No grok pattern matched" if @grok_failure_key
           yield time, record
         end
       end

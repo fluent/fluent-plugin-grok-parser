@@ -145,6 +145,39 @@ Fluentd accumulates data in the buffer forever to parse complete data when no pa
 
 You can use this parser without `multiline_start_regexp` when you know your data structure perfectly.
 
+## Configurations
+
+**time_format**
+
+The format of the time field.
+
+**grok_pattern**
+
+The pattern of grok. You cannot specify multiple grok pattern with this.
+
+**custom_pattern_path**
+
+Path to the file that includes custom grok patterns
+
+**grok_failure_key**
+
+The key has grok failure reason.
+
+**grok/pattern**
+
+Section for grok patterns. You can use multiple grok patterns with
+multiple `<grok>` sections.
+
+```aconf
+<grok>
+  pattern %{IP:ipaddress}
+</grok>
+```
+
+**multiline_start_regexp**
+
+The regexp to match beginning of multiline. This is only for "multiline_grok".
+
 ## How to write Grok patterns
 
 Grok patterns look like `%{PATTERN_NAME:name}` where ":name" is optional. If "name" is provided, then it

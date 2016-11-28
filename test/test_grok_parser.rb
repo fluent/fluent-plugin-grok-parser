@@ -123,10 +123,48 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
+  class NoGrokPatternMatched < self
+    def test_with_grok_failure_key
+      config = %[
+        grok_failure_key grok_failure
+        <grok>
+          pattern %{PATH:path}
+        </grok>
+      ]
+      expected = {
+        "grok_failure" => "No grok pattern matched",
+        "message" => "no such pattern"
+      }
+      d = create_driver(config)
+      d.instance.parse("no such pattern") do |_time, record|
+        assert_equal(expected, record)
+      end
+    end
+
+    def test_without_grok_failure_key
+      config = %[
+        <grok>
+          pattern %{PATH:path}
+        </grok>
+      ]
+      expected = {
+        "message" => "no such pattern"
+      }
+      d = create_driver(config)
+      d.instance.parse("no such pattern") do |_time, record|
+        assert_equal(expected, record)
+      end
+    end
+  end
+
   private
 
+  def create_driver(conf)
+    Fluent::Test::Driver::Parser.new(Fluent::Plugin::GrokParser).configure(conf)
+  end
+
   def internal_test_grok_pattern(grok_pattern, text, expected_time, expected_record, options = {})
-    d = Fluent::Test::Driver::Parser.new(Fluent::Plugin::GrokParser).configure({"grok_pattern" => grok_pattern}.merge(options))
+    d = create_driver({"grok_pattern" => grok_pattern}.merge(options))
 
     # for the new API
     d.instance.parse(text) {|time, record|

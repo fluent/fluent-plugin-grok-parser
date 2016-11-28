@@ -61,6 +61,40 @@ TEXT
     assert(d.instance.firstline?(text))
   end
 
+  class NoGrokPatternMatched < self
+    def test_with_grok_failure_key
+      config = %[
+        grok_failure_key grok_failure
+        <grok>
+          pattern %{PATH:path}
+        </grok>
+      ]
+      expected = {
+        "grok_failure" => "No grok pattern matched",
+        "message" => "no such pattern\nno such pattern\n"
+      }
+      d = create_driver(config)
+      d.instance.parse("no such pattern\nno such pattern\n") do |_time, record|
+        assert_equal(expected, record)
+      end
+    end
+
+    def test_without_grok_failure_key
+      config = %[
+        <grok>
+          pattern %{PATH:path}
+        </grok>
+      ]
+      expected = {
+        "message" => "no such pattern\nno such pattern\n"
+      }
+      d = create_driver(config)
+      d.instance.parse("no such pattern\nno such pattern\n") do |_time, record|
+        assert_equal(expected, record)
+      end
+    end
+  end
+
   private
 
   def create_driver(conf)
