@@ -8,14 +8,6 @@ module Fluent
       desc "The regexp to match beginning of multiline"
       config_param :multiline_start_regexp, :string, default: nil
 
-      def initialize
-        super
-      end
-
-      def configure(conf={})
-        super
-      end
-
       def has_firstline?
         !!@multiline_start_regexp
       end
