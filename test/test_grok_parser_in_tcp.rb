@@ -34,7 +34,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
   ]
 
   def create_driver(conf)
-    Fluent::Test::Driver::Input.new(Fluent::TcpInput).configure(conf)
+    Fluent::Test::Driver::Input.new(Fluent::Plugin::TcpInput).configure(conf)
   end
 
   def test_configure
