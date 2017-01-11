@@ -24,29 +24,36 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
   BASE_CONFIG = %[
     port #{PORT}
     tag tcp
-    format grok
   ]
   CONFIG = BASE_CONFIG + %[
     bind 127.0.0.1
+    <parse>
+      @type grok
+    </parse>
   ]
   IPv6_CONFIG = BASE_CONFIG + %[
     bind ::1
+    <parse>
+      @type grok
+    </parse>
   ]
 
   def create_driver(conf)
     Fluent::Test::Driver::Input.new(Fluent::Plugin::TcpInput).configure(conf)
   end
 
-  def test_configure
-    configs = {"127.0.0.1" => CONFIG}
-    configs.merge!("::1" => IPv6_CONFIG) if ipv6_enabled?
-
-    configs.each_pair { |k, v|
-      d = create_driver(v)
-      assert_equal PORT, d.instance.port
-      assert_equal k, d.instance.bind
-      assert_equal "\n", d.instance.delimiter
-    }
+  data do
+    configs = {}
+    configs[:ipv4] = ["127.0.0.1", CONFIG]
+    configs[:ipv6] = ["::1", IPv6_CONFIG] if ipv6_enabled?
+    configs
+  end
+  def test_configure(data)
+    k, config = data
+    d = create_driver(config)
+    assert_equal PORT, d.instance.port
+    assert_equal k, d.instance.bind
+    assert_equal "\n", d.instance.delimiter
   end
 
   def test_grok_pattern
@@ -54,13 +61,30 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
       {"msg" => "tcptest1\n", "expected" => "tcptest1"},
       {"msg" => "tcptest2\n", "expected" => "tcptest2"},
     ]
-    block_config = %[
-      <grok>
-        pattern %{GREEDYDATA:message}
-      </grok>
+    config = %[
+      <parse>
+        @type grok
+        grok_pattern %{GREEDYDATA:message}
+      </parse>
     ]
 
-    internal_test_grok("grok_pattern %{GREEDYDATA:message}", tests)
+    internal_test_grok(config, tests)
+  end
+
+  def test_grok_pattern_block_config
+    tests = [
+      {"msg" => "tcptest1\n", "expected" => "tcptest1"},
+      {"msg" => "tcptest2\n", "expected" => "tcptest2"},
+    ]
+    block_config = %[
+      <parse>
+        @type grok
+        <grok>
+          pattern %{GREEDYDATA:message}
+        </grok>
+      </parse>
+    ]
+
     internal_test_grok(block_config, tests)
   end
 
@@ -70,12 +94,15 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
       {"msg" => "The first word matches\n", "expected" => "The"}
     ]
     block_config = %[
-      <grok>
-        pattern %{TIMESTAMP_ISO8601:message}
-      </grok>
-      <grok>
-        pattern %{WORD:message}
-      </grok>
+      <parse>
+        @type grok
+        <grok>
+          pattern %{TIMESTAMP_ISO8601:message}
+        </grok>
+        <grok>
+          pattern %{WORD:message}
+        </grok>
+      </parse>
     ]
     internal_test_grok(block_config, tests)
   end
