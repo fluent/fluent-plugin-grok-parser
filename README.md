@@ -2,6 +2,14 @@
 
 This is a Fluentd plugin to enable Logstash's Grok-like parsing logic.
 
+## Requirements
+
+| fluent-plugin-grok-parser | fluentd    | ruby   |
+|---------------------------+------------+--------|
+| >= 1.0.0                  | >= v0.14.0 | >= 2.1 |
+| < 1.0.0                   | >= v0.12.0 | >= 1.9 |
+
+
 ## What's Grok?
 
 Grok is a macro to simplify and reuse regexes, originally developed by [Jordan Sissel](http://github.com/jordansissel).
