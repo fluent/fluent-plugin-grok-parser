@@ -1,4 +1,5 @@
 require "fluent/plugin/grok"
+require "fluent/plugin/parser_none"
 
 module Fluent
   module Plugin
@@ -16,7 +17,7 @@ module Fluent
 
       def initialize
         super
-        @default_parser = NoneParser.new
+        @default_parser = Fluent::Plugin::NoneParser.new
       end
 
       def configure(conf={})
