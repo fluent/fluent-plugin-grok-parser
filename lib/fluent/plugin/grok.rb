@@ -1,3 +1,5 @@
+require "fluent/plugin/parser_regexp"
+
 module Fluent
   class Grok
     class GrokPatternNotFoundError < StandardError
