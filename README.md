@@ -33,7 +33,7 @@ extracts the first IP address that matches in the log.
 </source>
 ```
 
-You can also use Fluentd v0.12 style:
+For Fluentd v0.12, use following style:
 
 ```aconf
 <source>
@@ -68,7 +68,7 @@ You can also use Fluentd v0.12 style:
 </source>
 ```
 
-You can also use Fluentd v0.12 style:
+For Fluentd v0.12, use following style:
 
 ```aconf
 <source>
@@ -106,7 +106,7 @@ You can parse multiple line text.
 </source>
 ```
 
-You can also use Fluentd v0.12 style:
+For Fluentd v0.12, use following style:
 
 ```aconf
 <source>
@@ -135,7 +135,7 @@ You can use multiple grok patterns to parse your data.
 </source>
 ```
 
-You can also use Fluentd v0.12 style:
+For Fluentd v0.12, use following style:
 
 ```aconf
 <source>
