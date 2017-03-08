@@ -95,6 +95,12 @@ TEXT
     end
   end
 
+  def test_no_grok_patterns
+    assert_raise Fluent::ConfigError do
+      create_driver('')
+    end
+  end
+
   private
 
   def create_driver(conf)
