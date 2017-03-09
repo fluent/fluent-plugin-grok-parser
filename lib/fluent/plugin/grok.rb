@@ -51,7 +51,7 @@ module Fluent
           @parsers << expand_pattern_expression(grok_conf["pattern"], grok_conf)
         end
       end
-      if @parsers.size.zero?
+      if @parsers.empty?
         raise Fluent::ConfigError, 'no grok patterns. Check configuration, e.g. typo, configuration syntax, etc'
       end
     end
