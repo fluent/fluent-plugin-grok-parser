@@ -29,12 +29,18 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
     bind 127.0.0.1
     <parse>
       @type grok
+      <grok>
+        pattern %{GREEDYDATA:message}
+      </grok>
     </parse>
   ]
   IPv6_CONFIG = BASE_CONFIG + %[
     bind ::1
     <parse>
       @type grok
+      <grok>
+        pattern %{GREEDYDATA:message}
+      </grok>
     </parse>
   ]
 
