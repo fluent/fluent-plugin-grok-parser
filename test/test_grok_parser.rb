@@ -165,7 +165,7 @@ class GrokParserTest < ::Test::Unit::TestCase
 
   def test_invalid_config_value_type
     assert_raise Fluent::ConfigError do
-      d = create_driver(%[
+      create_driver(%[
         <grok>
           pattern %{PATH:path:foo}
         </grok>
