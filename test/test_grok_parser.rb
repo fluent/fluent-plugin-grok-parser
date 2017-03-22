@@ -11,6 +11,10 @@ def str2time(str_time, format = nil)
 end
 
 class GrokParserTest < ::Test::Unit::TestCase
+  def setup
+    Fluent::Test.setup
+  end
+
   class Timestamp < self
     def test_timestamp_iso8601
       internal_test_grok_pattern("%{TIMESTAMP_ISO8601:time}", "Some stuff at 2014-01-01T00:00:00+0900",
@@ -171,6 +175,23 @@ class GrokParserTest < ::Test::Unit::TestCase
         </grok>
       ])
     end
+  end
+
+  def test_invalid_config_value_type_and_normal_grok_pattern
+    d = create_driver(%[
+      <grok>
+        pattern %{PATH:path:foo}
+      </grok>
+      <grok>
+        pattern %{IP:ip_address}
+      </grok>
+    ])
+    assert_equal(1, d.instance.instance_variable_get(:@grok).parsers.size)
+    logs = $log.instance_variable_get(:@logger).instance_variable_get(:@logdev).logs
+    error_logs = logs.grep(/error_class/)
+    assert_equal(1, error_logs.size)
+    error_message = error_logs.first[/error="(.+)"/, 1]
+    assert_equal("unknown value conversion for key:'path', type:'foo'", error_message)
   end
 
   private
