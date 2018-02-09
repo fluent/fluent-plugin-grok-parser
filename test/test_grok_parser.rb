@@ -69,17 +69,9 @@ class GrokParserTest < ::Test::Unit::TestCase
   end
 
   def test_call_for_custom_pattern
-    pattern_file = File.new(File.expand_path("../my_pattern", __FILE__), "w")
-    pattern_file.write("MY_AWESOME_PATTERN %{GREEDYDATA:message}\n")
-    pattern_file.close
-    begin
-      internal_test_grok_pattern("%{MY_AWESOME_PATTERN:message}", "this is awesome",
-                                 nil, {"message" => "this is awesome"},
-                                 "custom_pattern_path" => pattern_file.path
-                                )
-    ensure
-      File.delete(pattern_file.path)
-    end
+    internal_test_grok_pattern("%{MY_AWESOME_PATTERN:message}", "this is awesome",
+                               nil, {"message" => "this is awesome"},
+                               "custom_pattern_path" => fixtures("my_pattern").to_s)
   end
 
   class OptionalType < self

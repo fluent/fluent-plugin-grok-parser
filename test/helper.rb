@@ -2,8 +2,13 @@ require "fluent/test"
 require "fluent/test/helpers"
 require "fluent/test/driver/input"
 require "fluent/test/driver/parser"
+require "pathname"
 
 Test::Unit::TestCase.include(Fluent::Test::Helpers)
+
+def fixtures(name)
+  Pathname(__dir__).expand_path + "fixtures" + name
+end
 
 def unused_port
   s = TCPServer.open(0)
