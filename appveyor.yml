@@ -1,0 +1,10 @@
+version: '{build}'
+install:
+  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
+  - "%devkit%\\devkitvars.bat"
+  - ruby --version
+  - gem --version
+  - bundle install
+build: off
+test_script:
+  - bundle exec rake test
