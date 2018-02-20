@@ -91,7 +91,9 @@ module Fluent
         else
           replacement_pattern = curr_pattern
         end
-        pattern.sub!(m[0]) do |s| replacement_pattern end
+        pattern.sub!(m[0]) do |s|
+          replacement_pattern
+        end
       end
 
       [pattern, type_map]
