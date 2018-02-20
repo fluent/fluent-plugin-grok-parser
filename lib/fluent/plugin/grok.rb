@@ -82,7 +82,7 @@ module Fluent
           replacement_pattern = "(?<#{m["subname"]}>#{curr_pattern})"
           type_map[m["subname"]] = m["type"] || "string"
         else
-          replacement_pattern = curr_pattern
+          replacement_pattern = "(?:#{curr_pattern})"
         end
         pattern.sub!(m[0]) do |s| replacement_pattern end
       end

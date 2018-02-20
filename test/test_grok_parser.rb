@@ -37,6 +37,11 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
+  def test_date
+    internal_test_grok_pattern("\\[(?<date>%{DATE} %{TIME} (?:AM|PM))\\]", "[2/16/2018 10:19:34 AM]",
+                               nil, { "date" => "2/16/2018 10:19:34 AM" })
+  end
+
   def test_call_for_grok_pattern_not_found
     assert_raise Grok::GrokPatternNotFoundError do
       internal_test_grok_pattern('%{THIS_PATTERN_DOESNT_EXIST}', 'Some stuff at somewhere', nil, {})
