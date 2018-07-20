@@ -6,8 +6,8 @@ This is a Fluentd plugin to enable Logstash's Grok-like parsing logic.
 
 | fluent-plugin-grok-parser | fluentd    | ruby   |
 |---------------------------|------------|--------|
-| >= 1.0.0                  | >= v0.14.0 | >= 2.1 |
-| < 1.0.0                   | >= v0.12.0 | >= 1.9 |
+| >= 2.0.0                  | >= v0.14.0 | >= 2.1 |
+| < 2.0.0                   | >= v0.12.0 | >= 1.9 |
 
 
 ## What's Grok?
@@ -310,7 +310,7 @@ Here is a sample config using the Grok parser with `in_tail` and the `types` par
 
 ## Notice
 
-If you want to use this plugin with Fluentd v0.12.x or earlier, you can use this plugin version v1.0.0.
+If you want to use this plugin with Fluentd v0.12.x or earlier, you can use this plugin version v1.x.
 
 See also: [Plugin Management | Fluentd](http://docs.fluentd.org/articles/plugin-management#plugin-version-management)
 
