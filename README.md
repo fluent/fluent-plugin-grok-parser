@@ -89,20 +89,6 @@ You can use multiple grok patterns to parse your data.
 </source>
 ```
 
-For Fluentd v0.12, use following style:
-
-```aconf
-<source>
-  @type tail
-  path /path/to/log
-  format multiline_grok
-  <grok>
-    pattern Started %{WORD:verb} "%{URIPATH:pathinfo}" for %{IP:ip} at %{TIMESTAMP_ISO8601:timestamp}\nProcessing by %{WORD:controller}#%{WORD:action} as %{WORD:format}%{DATA:message}Completed %{NUMBER:response} %{WORD} in %{NUMBER:elapsed} (%{DATA:elapsed_details})
-  </grok>
-  tag grokked_log
-</source>
-```
-
 Fluentd accumulates data in the buffer forever to parse complete data when no pattern matches.
 
 You can use this parser without `multiline_start_regexp` when you know your data structure perfectly.
