@@ -33,18 +33,6 @@ extracts the first IP address that matches in the log.
 </source>
 ```
 
-For Fluentd v0.12, use following style:
-
-```aconf
-<source>
-  @type tail
-  path /path/to/log
-  tag grokked_log
-  format grok
-  grok_pattern %{IP:ip_address}
-</source>
-```
-
 **If you want to try multiple grok patterns and use the first matched one**, you can use the following syntax:
 
 ```aconf
@@ -68,27 +56,6 @@ For Fluentd v0.12, use following style:
 </source>
 ```
 
-For Fluentd v0.12, use following style:
-
-```aconf
-<source>
-  @type tail
-  path /path/to/log
-  tag grokked_log
-  format grok
-  <grok>
-    pattern %{COMBINEDAPACHELOG}
-    time_format "%d/%b/%Y:%H:%M:%S %z"
-  </grok>
-  <grok>
-    pattern %{IP:ip_address}
-  </grok>
-  <grok>
-    pattern %{GREEDYDATA:message}
-  </grok>
-</source>
-```
-
 ### Multiline support
 
 You can parse multiple line text.
@@ -103,19 +70,6 @@ You can parse multiple line text.
     grok_pattern %{IP:ip_address}%{GREEDYDATA:message}
     multiline_start_regexp /^[^\s]/
   </parse>
-</source>
-```
-
-For Fluentd v0.12, use following style:
-
-```aconf
-<source>
-  @type tail
-  path /path/to/log
-  format multiline_grok
-  grok_pattern %{IP:ip_address}%{GREEDYDATA:message}
-  multiline_start_regexp /^[^\s]/
-  tag grokked_log
 </source>
 ```
 
