@@ -50,7 +50,7 @@ TEXT
     end
   end
 
-  def test_empty_range_text_in_text
+  test "empty_range_text_in_text" do
     text = " [b-a]"
     conf = %[
       grok_pattern %{HOSTNAME:hostname} %{GREEDYDATA:message}
@@ -61,8 +61,8 @@ TEXT
     assert(d.instance.firstline?(text))
   end
 
-  class NoGrokPatternMatched < self
-    def test_with_grok_failure_key
+  sub_test_case "NoGrokPatternMatched" do
+    test "with grok_failure_key" do
       config = %[
         grok_failure_key grok_failure
         <grok>
@@ -79,7 +79,7 @@ TEXT
       end
     end
 
-    def test_without_grok_failure_key
+    test "without grok_failure" do
       config = %[
         <grok>
           pattern %{PATH:path}
@@ -95,7 +95,7 @@ TEXT
     end
   end
 
-  def test_no_grok_patterns
+  test "no_grok_patterns" do
     assert_raise Fluent::ConfigError do
       create_driver('')
     end

@@ -16,7 +16,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
     end
   end
 
-  def setup
+  setup do
     Fluent::Test.setup
   end
 
@@ -54,15 +54,14 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
     configs[:ipv6] = ["::1", IPv6_CONFIG] if ipv6_enabled?
     configs
   end
-  def test_configure(data)
-    k, config = data
+  test "configure" do |(ip, config)|
     d = create_driver(config)
     assert_equal PORT, d.instance.port
-    assert_equal k, d.instance.bind
+    assert_equal ip, d.instance.bind
     assert_equal "\n", d.instance.delimiter
   end
 
-  def test_grok_pattern
+  test "grok_pattern" do
     tests = [
       {"msg" => "tcptest1\n", "expected" => "tcptest1"},
       {"msg" => "tcptest2\n", "expected" => "tcptest2"},
@@ -77,7 +76,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
     internal_test_grok(config, tests)
   end
 
-  def test_grok_pattern_block_config
+  test "grok_pattern_block_config" do
     tests = [
       {"msg" => "tcptest1\n", "expected" => "tcptest1"},
       {"msg" => "tcptest2\n", "expected" => "tcptest2"},
@@ -94,7 +93,7 @@ class TcpInputWithGrokTest < Test::Unit::TestCase
     internal_test_grok(block_config, tests)
   end
 
-  def test_grok_multi_patterns
+  test "grok_multi_patterns" do
     tests = [
       {"msg" => "Current time is 2014-01-01T00:00:00+0900\n", "expected" => "2014-01-01T00:00:00+0900"},
       {"msg" => "The first word matches\n", "expected" => "The"}

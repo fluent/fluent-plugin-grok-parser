@@ -11,49 +11,49 @@ def str2time(str_time, format = nil)
 end
 
 class GrokParserTest < ::Test::Unit::TestCase
-  def setup
+  setup do
     Fluent::Test.setup
   end
 
-  class Timestamp < self
-    def test_timestamp_iso8601
+  sub_test_case "timestamp" do
+    test "timestamp iso8601" do
       internal_test_grok_pattern("%{TIMESTAMP_ISO8601:time}", "Some stuff at 2014-01-01T00:00:00+0900",
                                  event_time("2014-01-01T00:00:00+0900"), {})
     end
 
-    def test_datestamp_rfc822_with_zone
+    test "datestamp rfc822 with zone" do
       internal_test_grok_pattern("%{DATESTAMP_RFC822:time}", "Some stuff at Mon Aug 15 2005 15:52:01 UTC",
                                  event_time("Mon Aug 15 2005 15:52:01 UTC"), {})
     end
 
-    def test_datestamp_rfc822_with_numeric_zone
+    test "datestamp rfc822 with numeric zone" do
       internal_test_grok_pattern("%{DATESTAMP_RFC2822:time}", "Some stuff at Mon, 15 Aug 2005 15:52:01 +0000",
                                  event_time("Mon, 15 Aug 2005 15:52:01 +0000"), {})
     end
 
-    def test_syslogtimestamp
+    test "syslogtimestamp" do
       internal_test_grok_pattern("%{SYSLOGTIMESTAMP:time}", "Some stuff at Aug 01 00:00:00",
                                  event_time("Aug 01 00:00:00"), {})
     end
   end
 
-  def test_date
+  test "date" do
     internal_test_grok_pattern("\\[(?<date>%{DATE} %{TIME} (?:AM|PM))\\]", "[2/16/2018 10:19:34 AM]",
                                nil, { "date" => "2/16/2018 10:19:34 AM" })
   end
 
-  def test_call_for_grok_pattern_not_found
+  test "grok pattern not found" do
     assert_raise Fluent::Grok::GrokPatternNotFoundError do
       internal_test_grok_pattern("%{THIS_PATTERN_DOESNT_EXIST}", "Some stuff at somewhere", nil, {})
     end
   end
 
-  def test_call_for_multiple_fields
+  test "multiple fields" do
     internal_test_grok_pattern("%{MAC:mac_address} %{IP:ip_address}", "this.wont.match DEAD.BEEF.1234 127.0.0.1", nil,
                                {"mac_address" => "DEAD.BEEF.1234", "ip_address" => "127.0.0.1"})
   end
 
-  def test_call_for_complex_pattern
+  test "complex pattern" do
     internal_test_grok_pattern("%{COMBINEDAPACHELOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
                                 str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
                                 {
@@ -73,59 +73,59 @@ class GrokParserTest < ::Test::Unit::TestCase
                               )
   end
 
-  def test_call_for_custom_pattern
+  test "custom pattern" do
     internal_test_grok_pattern("%{MY_AWESOME_PATTERN:message}", "this is awesome",
                                nil, {"message" => "this is awesome"},
                                "custom_pattern_path" => fixtures("my_pattern").to_s)
   end
 
-  class OptionalType < self
-    def test_simple
+  sub_test_case "OptionalType" do
+    test "simple" do
       internal_test_grok_pattern("%{INT:user_id:integer} paid %{NUMBER:paid_amount:float}",
                                  "12345 paid 6789.10", nil,
                                  {"user_id" => 12345, "paid_amount" => 6789.1 })
     end
 
-    def test_array
+    test "array" do
       internal_test_grok_pattern("%{GREEDYDATA:message:array}",
                                  "a,b,c,d", nil,
                                  {"message" => %w(a b c d)})
     end
 
-    def test_array_with_delimiter
+    test "array with delimiter" do
       internal_test_grok_pattern("%{GREEDYDATA:message:array:|}",
                                  "a|b|c|d", nil,
                                  {"message" => %w(a b c d)})
     end
 
-    def test_timestamp_iso8601
+    test "timestamp iso8601" do
       internal_test_grok_pattern("%{TIMESTAMP_ISO8601:stamp:time}", "Some stuff at 2014-01-01T00:00:00+0900",
                                  nil, {"stamp" => event_time("2014-01-01T00:00:00+0900")})
     end
 
-    def test_datestamp_rfc822_with_zone
+    test "datestamp rfc822 with zone" do
       internal_test_grok_pattern("%{DATESTAMP_RFC822:stamp:time}", "Some stuff at Mon Aug 15 2005 15:52:01 UTC",
                                  nil, {"stamp" => event_time("Mon Aug 15 2005 15:52:01 UTC")})
     end
 
-    def test_datestamp_rfc822_with_numeric_zone
+    test "datestamp rfc822 with numeric zone" do
       internal_test_grok_pattern("%{DATESTAMP_RFC2822:stamp:time}", "Some stuff at Mon, 15 Aug 2005 15:52:01 +0000",
                                  nil, {"stamp" => event_time("Mon, 15 Aug 2005 15:52:01 +0000")})
     end
 
-    def test_syslogtimestamp
+    test "syslogtimestamp" do
       internal_test_grok_pattern("%{SYSLOGTIMESTAMP:stamp:time}", "Some stuff at Aug 01 00:00:00",
                                  nil, {"stamp" => event_time("Aug 01 00:00:00")})
     end
 
-    def test_timestamp_with_format
+    test "timestamp with format" do
       internal_test_grok_pattern("%{TIMESTAMP_ISO8601:stamp:time:%Y-%m-%d %H%M}", "Some stuff at 2014-01-01 1000",
                                  nil, {"stamp" => event_time("2014-01-01 10:00")})
     end
   end
 
-  class NoGrokPatternMatched < self
-    def test_with_grok_failure_key
+  sub_test_case "NoGrokPatternMatched" do
+    test "with grok_failure_key" do
       config = %[
         grok_failure_key grok_failure
         <grok>
@@ -142,7 +142,7 @@ class GrokParserTest < ::Test::Unit::TestCase
       end
     end
 
-    def test_without_grok_failure_key
+    test "without grok_failure_key" do
       config = %[
         <grok>
           pattern %{PATH:path}
@@ -158,13 +158,13 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
-  def test_no_grok_patterns
+  test "no grok patterns" do
     assert_raise Fluent::ConfigError do
       create_driver('')
     end
   end
 
-  def test_invalid_config_value_type
+  test "invalid config value type" do
     assert_raise Fluent::ConfigError do
       create_driver(%[
         <grok>
@@ -174,7 +174,7 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
-  def test_invalid_config_value_type_and_normal_grok_pattern
+  test "invalid config value type and normal grok pattern" do
     d = create_driver(%[
       <grok>
         pattern %{PATH:path:foo}
