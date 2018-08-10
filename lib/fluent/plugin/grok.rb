@@ -51,7 +51,9 @@ module Fluent
           @parsers[grok_conf.name || index] = expand_pattern_expression(grok_conf.pattern, grok_conf)
         end
       end
-      @parsers.compact!
+      @parsers.reject! do |key, parser|
+        parser.nil?
+      end
       if @parsers.empty?
         raise Fluent::ConfigError, 'no grok patterns. Check configuration, e.g. typo, configuration syntax, etc'
       end
