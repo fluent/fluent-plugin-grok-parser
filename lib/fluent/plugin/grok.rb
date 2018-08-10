@@ -61,7 +61,7 @@ module Fluent
 
     def expand_pattern_expression(grok_pattern, conf)
       regexp, types = expand_pattern(grok_pattern)
-      $log.info "Expanded the pattern #{conf['grok_pattern']} into #{regexp}"
+      $log.info "Expanded the pattern #{grok_pattern} into #{regexp}"
       unless types.empty?
         conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
       end
