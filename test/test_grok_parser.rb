@@ -191,6 +191,116 @@ class GrokParserTest < ::Test::Unit::TestCase
     assert_equal("unknown value conversion for key:'path', type:'foo'", error_message)
   end
 
+  sub_test_case "grok_name_key" do
+    test "one grok section with name" do
+      d = create_driver(%[
+        grok_name_key grok_name
+        <grok>
+          name path
+          pattern %{PATH:path}
+        </grok>
+      ])
+      expected = {
+        "path" => "/",
+        "grok_name" => "path"
+      }
+      d.instance.parse("/") do |time, record|
+        assert_equal(expected, record)
+      end
+    end
+
+    test "one grok section without name" do
+      d = create_driver(%[
+        grok_name_key grok_name
+        <grok>
+          pattern %{PATH:path}
+        </grok>
+      ])
+      expected = {
+        "path" => "/",
+        "grok_name" => 0
+      }
+      d.instance.parse("/") do |time, record|
+        assert_equal(expected, record)
+      end
+    end
+
+    test "multiple grok sections with name" do
+      d = create_driver(%[
+        grok_name_key grok_name
+        <grok>
+          name path
+          pattern %{PATH:path}
+        </grok>
+        <grok>
+          name ip
+          pattern %{IP:ip_address}
+        </grok>
+      ])
+      expected = [
+        { "path" => "/", "grok_name" => "path" },
+        { "ip_address" => "127.0.0.1", "grok_name" => "ip" },
+      ]
+      records = []
+      d.instance.parse("/") do |time, record|
+        records << record
+      end
+      d.instance.parse("127.0.0.1") do |time, record|
+        records << record
+      end
+      assert_equal(expected, records)
+    end
+
+    test "multiple grok sections without name" do
+      d = create_driver(%[
+        grok_name_key grok_name
+        <grok>
+          pattern %{PATH:path}
+        </grok>
+        <grok>
+          pattern %{IP:ip_address}
+        </grok>
+      ])
+      expected = [
+        { "path" => "/", "grok_name" => 0 },
+        { "ip_address" => "127.0.0.1", "grok_name" => 1 },
+      ]
+      records = []
+      d.instance.parse("/") do |time, record|
+        records << record
+      end
+      d.instance.parse("127.0.0.1") do |time, record|
+        records << record
+      end
+      assert_equal(expected, records)
+    end
+
+    test "multiple grok sections with both name and index" do
+      d = create_driver(%[
+        grok_name_key grok_name
+        <grok>
+          name path
+          pattern %{PATH:path}
+        </grok>
+        <grok>
+          pattern %{IP:ip_address}
+        </grok>
+      ])
+      expected = [
+        { "path" => "/", "grok_name" => "path" },
+        { "ip_address" => "127.0.0.1", "grok_name" => 1 },
+      ]
+      records = []
+      d.instance.parse("/") do |time, record|
+        records << record
+      end
+      d.instance.parse("127.0.0.1") do |time, record|
+        records << record
+      end
+      assert_equal(expected, records)
+    end
+  end
+
   private
 
   def create_driver(conf)
