@@ -14,8 +14,12 @@ module Fluent
       config_param :custom_pattern_path, :string, default: nil
       desc "The key has grok failure reason"
       config_param :grok_failure_key, :string, default: nil
+      desc "The key name to store grok section's name"
+      config_param :grok_name_key, :string, default: nil
 
       config_section :grok, param_name: "grok_confs", multi: true do
+        desc "The name of this grok section"
+        config_param :name, :string, default: nil
         desc "The pattern of grok"
         config_param :pattern, :string
       end
@@ -49,9 +53,10 @@ module Fluent
       end
 
       def parse(text)
-        @grok.parsers.each do |parser|
+        @grok.parsers.each do |name_or_index, parser|
           parser.parse(text) do |time, record|
             if time and record
+              record[@grok_name_key] = name_or_index if @grok_name_key
               yield time, record
               return
             end
