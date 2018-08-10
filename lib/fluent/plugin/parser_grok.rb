@@ -15,6 +15,11 @@ module Fluent
       desc "The key has grok failure reason"
       config_param :grok_failure_key, :string, default: nil
 
+      config_section :grok, param_name: "grok_confs", multi: true do
+        desc "The pattern of grok"
+        config_param :pattern, :string
+      end
+
       def initialize
         super
         @default_parser = Fluent::Plugin::NoneParser.new

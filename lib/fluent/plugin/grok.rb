@@ -26,11 +26,12 @@ module Fluent
       @parsers = []
       @multiline_mode = false
       @conf = conf
-      if plugin.respond_to?(:firstline?)
+      @plugin = plugin
+      if @plugin.respond_to?(:firstline?)
         @multiline_mode = true
       end
-      if @conf["multiline_start_regexp"]
-        @multiline_start_regexp = Regexp.compile(@conf["multiline_start_regexp"][1..-2])
+      if @plugin.respond_to?(:multiline_start_regexp) && @plugin.multiline_start_regexp
+        @multiline_start_regexp = Regexp.compile(@plugin.multiline_start_regexp[1..-2])
       end
     end
 
@@ -43,12 +44,11 @@ module Fluent
     end
 
     def setup
-      if @conf["grok_pattern"]
-        @parsers << expand_pattern_expression(@conf["grok_pattern"], @conf)
+      if @plugin.grok_pattern
+        @parsers << expand_pattern_expression(@plugin.grok_pattern, @conf)
       else
-        grok_confs = @conf.elements.select {|e| e.name == "grok"}
-        grok_confs.each do |grok_conf|
-          @parsers << expand_pattern_expression(grok_conf["pattern"], grok_conf)
+        @plugin.grok_confs.each do |grok_conf|
+          @parsers << expand_pattern_expression(grok_conf.pattern, grok_conf)
         end
       end
       @parsers.compact!
@@ -61,11 +61,12 @@ module Fluent
 
     def expand_pattern_expression(grok_pattern, conf)
       regexp, types = expand_pattern(grok_pattern)
-      $log.info "Expanded the pattern #{conf['grok_pattern']} into #{regexp}"
+      $log.info "Expanded the pattern #{grok_pattern} into #{regexp}"
+      _conf = conf.to_h
       unless types.empty?
-        conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
+        _conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
       end
-      _conf = conf.merge("expression" => regexp, "multiline" => @multiline_mode)
+      _conf = _conf.merge("expression" => regexp, "multiline" => @multiline_mode)
       config = Fluent::Config::Element.new("parse", nil, _conf, [])
       parser = Fluent::Plugin::RegexpParser.new
       parser.configure(config)
