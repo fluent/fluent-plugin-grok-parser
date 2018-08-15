@@ -23,7 +23,7 @@ module Fluent
 
     def initialize(plugin, conf)
       @pattern_map = {}
-      @parsers = []
+      @parsers = {}
       @multiline_mode = false
       @conf = conf
       @plugin = plugin
@@ -45,13 +45,15 @@ module Fluent
 
     def setup
       if @plugin.grok_pattern
-        @parsers << expand_pattern_expression(@plugin.grok_pattern, @conf)
+        @parsers[:grok_pattern] = expand_pattern_expression(@plugin.grok_pattern, @conf)
       else
-        @plugin.grok_confs.each do |grok_conf|
-          @parsers << expand_pattern_expression(grok_conf.pattern, grok_conf)
+        @plugin.grok_confs.each.with_index do |grok_conf, index|
+          @parsers[grok_conf.name || index] = expand_pattern_expression(grok_conf.pattern, grok_conf)
         end
       end
-      @parsers.compact!
+      @parsers.reject! do |key, parser|
+        parser.nil?
+      end
       if @parsers.empty?
         raise Fluent::ConfigError, 'no grok patterns. Check configuration, e.g. typo, configuration syntax, etc'
       end

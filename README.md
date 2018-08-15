@@ -95,21 +95,19 @@ You can use this parser without `multiline_start_regexp` when you know your data
 
 ## Configurations
 
-**time_format**
+* See also: [TimeParameters Plugin Overview](https://docs.fluentd.org/v1.0/articles/timeparameters-plugin-overview)
+* See also: [Parser Plugin Overview](https://docs.fluentd.org/v1.0/articles/parser-plugin-overview)
 
-The format of the time field.
+* **time_format** (string) (optional): The format of the time field.
+* **grok_pattern** (string) (optional): The pattern of grok. You cannot specify multiple grok pattern with this.
+* **custom_pattern_path** (string) (optional): Path to the file that includes custom grok patterns
+* **grok_failure_key** (string) (optional): The key has grok failure reason.
+* **grok_name_key** (string) (optional): The key name to store grok section's name
+* **multi_line_start_regexp** (string) (optional): The regexp to match beginning of multiline. This is only for "multiline_grok".
 
-**grok_pattern**
+## Examples
 
-The pattern of grok. You cannot specify multiple grok pattern with this.
-
-**custom_pattern_path**
-
-Path to the file that includes custom grok patterns
-
-**grok_failure_key**
-
-The key has grok failure reason. Default is `nil`.
+### Using grok\_failure\_key
 
 ```aconf
 <source>
@@ -149,21 +147,42 @@ This generates following events:
 2016-11-28 13:07:09.010400923 +0900 dummy.log: {"message1":"/","prog":"bar","path":"/"}
 ```
 
-
-**grok/pattern**
-
-Section for grok patterns. You can use multiple grok patterns with
-multiple `<grok>` sections.
+### Using grok\_name\_key
 
 ```aconf
-<grok>
-  pattern %{IP:ipaddress}
-</grok>
+<source>
+  @type tail
+  path /path/to/log
+  tag grokked_log
+  grok_name_key grok_name
+  grok_failure_key grokfailure
+  <parse>
+    @type grok
+    <grok>
+      name apache_log
+      pattern %{COMBINEDAPACHELOG}
+      time_format "%d/%b/%Y:%H:%M:%S %z"
+    </grok>
+    <grok>
+      name ip_address
+      pattern %{IP:ip_address}
+    </grok>
+    <grok>
+      name rest_message
+      pattern %{GREEDYDATA:message}
+    </grok>
+  </parse>
+</source>
 ```
 
-**multiline_start_regexp**
+This will add keys like following:
 
-The regexp to match beginning of multiline. This is only for "multiline_grok".
+* Add `grok_name: "apache_log"` if the record matches `COMBINEDAPACHELOG`
+* Add `grok_name: "ip_address"` if the record matches `IP`
+* Add `grok_name: "rest_message"` if the record matches `GREEDYDATA`
+
+Add `grokfailure` key to the record if the record does not match any grok pattern.
+See also test code for more details.
 
 ## How to write Grok patterns
 

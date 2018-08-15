@@ -17,9 +17,10 @@ module Fluent
       end
 
       def parse(text)
-        @grok.parsers.each do |parser|
+        @grok.parsers.each do |name_or_index, parser|
           parser.parse(text) do |time, record|
             if time and record
+              record[@grok_name_key] = name_or_index if @grok_name_key
               yield time, record
               return
             end
