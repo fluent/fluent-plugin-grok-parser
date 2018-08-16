@@ -154,10 +154,10 @@ This generates following events:
   @type tail
   path /path/to/log
   tag grokked_log
-  grok_name_key grok_name
-  grok_failure_key grokfailure
   <parse>
     @type grok
+    grok_name_key grok_name
+    grok_failure_key grokfailure
     <grok>
       name apache_log
       pattern %{COMBINEDAPACHELOG}
