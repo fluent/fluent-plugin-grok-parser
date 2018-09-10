@@ -301,6 +301,26 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
+  sub_test_case "keep_time_key" do
+    test "true" do
+      d = create_driver(%[
+        keep_time_key true
+        <grok>
+          pattern "%{TIMESTAMP_ISO8601:time}"
+        </grok>
+      ])
+      expected = [
+        { "time" => "2014-01-01T00:00:00+0900" }
+      ]
+      records = []
+      d.instance.parse("Some stuff at 2014-01-01T00:00:00+0900") do |time, record|
+        assert_equal(event_time("2014-01-01T00:00:00+0900"), time)
+        records << record
+      end
+      assert_equal(expected, records)
+    end
+  end
+
   private
 
   def create_driver(conf)
