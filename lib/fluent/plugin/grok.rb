@@ -33,6 +33,9 @@ module Fluent
       if @plugin.respond_to?(:multiline_start_regexp) && @plugin.multiline_start_regexp
         @multiline_start_regexp = Regexp.compile(@plugin.multiline_start_regexp[1..-2])
       end
+      if @plugin.respond_to?(:keep_time_key)
+        @keep_time_key = @plugin.keep_time_key
+      end
     end
 
     def add_patterns_from_file(path)
@@ -68,7 +71,7 @@ module Fluent
       unless types.empty?
         _conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
       end
-      _conf = _conf.merge("expression" => regexp, "multiline" => @multiline_mode)
+      _conf = _conf.merge("expression" => regexp, "multiline" => @multiline_mode, "keep_time_key" => @keep_time_key)
       config = Fluent::Config::Element.new("parse", nil, _conf, [])
       parser = Fluent::Plugin::RegexpParser.new
       parser.configure(config)
