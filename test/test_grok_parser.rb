@@ -321,6 +321,34 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
+  sub_test_case "grok section" do
+    test "complex pattern" do
+      d = create_driver(%[
+        <grok>
+          pattern %{COMBINEDAPACHELOG}
+          time_key timestamp
+          time_format %d/%b/%Y:%H:%M:%S %z
+        </grok>
+      ])
+      expected_record = {
+        "clientip"    => "127.0.0.1",
+        "ident"       => "192.168.0.1",
+        "auth"        => "-",
+        "verb"        => "GET",
+        "request"     => "/",
+        "httpversion" => "1.1",
+        "response"    => "200",
+        "bytes"       => "777",
+        "referrer"    => "\"-\"",
+        "agent"       => "\"Opera/12.0\""
+      }
+      d.instance.parse('127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"') do |time, record|
+        assert_equal(expected_record, record)
+        assert_equal(event_time("28/Feb/2013:12:00:00 +0900", format: "%d/%b/%Y:%H:%M:%S %z"), time)
+      end
+    end
+  end
+
   private
 
   def create_driver(conf)

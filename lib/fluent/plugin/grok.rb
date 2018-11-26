@@ -71,8 +71,12 @@ module Fluent
       unless types.empty?
         _conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
       end
-      _conf = _conf.merge("expression" => regexp, "multiline" => @multiline_mode, "keep_time_key" => @keep_time_key)
-      config = Fluent::Config::Element.new("parse", nil, _conf, [])
+      _conf["multiline"] = conf["multiline"] ||  @multiline_mode
+      _conf["keep_time_key"] = conf["keep_time_key"] || @keep_time_key
+      _conf["time_key"] = conf["time_key"] || "time"
+      _conf["time_format"] = conf["time_format"] || @time_format
+      _conf["expression"] = regexp
+      config = Fluent::Config::Element.new("parse", "", _conf, [])
       parser = Fluent::Plugin::RegexpParser.new
       parser.configure(config)
       parser
