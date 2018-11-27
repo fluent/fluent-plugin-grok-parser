@@ -36,6 +36,9 @@ module Fluent
       if @plugin.respond_to?(:keep_time_key)
         @keep_time_key = @plugin.keep_time_key
       end
+      if @plugin.respond_to?(:time_format)
+        @time_format = @plugin.time_format
+      end
     end
 
     def add_patterns_from_file(path)
