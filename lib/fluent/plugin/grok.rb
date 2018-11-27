@@ -48,10 +48,10 @@ module Fluent
 
     def setup
       if @plugin.grok_pattern
-        @parsers[:grok_pattern] = expand_pattern_expression(@plugin.grok_pattern, @conf)
+        @parsers[:grok_pattern] = expand_pattern_expression_grok_pattern(@plugin.grok_pattern, @conf)
       else
         @plugin.grok_confs.each.with_index do |grok_conf, index|
-          @parsers[grok_conf.name || index] = expand_pattern_expression(grok_conf.pattern, grok_conf)
+          @parsers[grok_conf.name || index] = expand_pattern_expression_grok_section(grok_conf)
         end
       end
       @parsers.reject! do |key, parser|
@@ -64,17 +64,44 @@ module Fluent
 
     private
 
-    def expand_pattern_expression(grok_pattern, conf)
+    def expand_pattern_expression_grok_pattern(grok_pattern, conf)
       regexp, types = expand_pattern(grok_pattern)
       $log.info "Expanded the pattern #{grok_pattern} into #{regexp}"
       _conf = conf.to_h
       unless types.empty?
         _conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
       end
-      _conf["multiline"] = conf["multiline"] ||  @multiline_mode
-      _conf["keep_time_key"] = conf["keep_time_key"] || @keep_time_key
-      _conf["time_key"] = conf["time_key"] || "time"
-      _conf["time_format"] = conf["time_format"] || @time_format
+      _conf = _conf.merge("expression" => regexp, "multiline" => @multiline_mode, "keep_time_key" => @keep_time_key)
+      config = Fluent::Config::Element.new("parse", nil, _conf, [])
+      parser = Fluent::Plugin::RegexpParser.new
+      parser.configure(config)
+      parser
+    rescue GrokPatternNotFoundError => e
+      raise e
+    rescue => e
+      $log.error(error: e)
+      nil
+    end
+
+    def expand_pattern_expression_grok_section(conf)
+      regexp, types = expand_pattern(conf.pattern)
+      $log.info "Expanded the pattern #{conf.pattern} into #{regexp}"
+      _conf = conf.to_h
+      unless types.empty?
+        _conf["types"] = types.map{|subname,type| "#{subname}:#{type}" }.join(",")
+      end
+      if conf["multiline"] ||  @multiline_mode
+        _conf["multiline"] = conf["multiline"] ||  @multiline_mode
+      end
+      if conf["keep_time_key"] || @keep_time_key
+        _conf["keep_time_key"] = conf["keep_time_key"] || @keep_time_key
+      end
+      if conf["time_key"]
+        _conf["time_key"] = conf["time_key"]
+      end
+      if conf["time_format"] || @time_format
+        _conf["time_format"] = conf["time_format"] || @time_format
+      end
       _conf["expression"] = regexp
       config = Fluent::Config::Element.new("parse", "", _conf, [])
       parser = Fluent::Plugin::RegexpParser.new
