@@ -32,19 +32,19 @@ environment:
       devkit: C:\Ruby23\DevKit
       ridk: 0
     - ruby_version: "22-x64"
-      devkit: C:\Ruby22-x64\DevKit
-      ridk: 1
+      devkit: C:\Ruby23-x64\DevKit
+      ridk: 0
     - ruby_version: "21-x64"
-      devkit: C:\Ruby21-x64\DevKit
-      ridk: 1
+      devkit: C:\Ruby23-x64\DevKit
+      ridk: 0
     - ruby_version: "22"
-      devkit: C:\Ruby22\DevKit
-      ridk: 1
+      devkit: C:\Ruby23\DevKit
       WIN_RAPID: true
+      ridk: 0
     - ruby_version: "21"
-      devkit: C:\Ruby21\DevKit
-      ridk: 1
+      devkit: C:\Ruby23\DevKit
       WIN_RAPID: true
+      ridk: 0
 matrix:
   allow_failures:
     - ruby_version: "21"
