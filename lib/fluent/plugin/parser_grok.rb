@@ -22,6 +22,9 @@ module Fluent
         config_param :name, :string, default: nil
         desc "The pattern of grok"
         config_param :pattern, :string
+        config_param :keep_time_key, :bool, default: false
+        config_param :time_key, :string, default: "time"
+        config_param :time_format, :string, default: nil
       end
 
       def initialize
