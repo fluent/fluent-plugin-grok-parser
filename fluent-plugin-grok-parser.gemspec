@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-grok-parser"
-  spec.version       = "2.3.0"
+  spec.version       = "2.4.0"
   spec.authors       = ["kiyoto", "Kenji Okimoto"]
   spec.email         = ["kiyoto@treasure-data.com", "okimoto@clear-code.com"]
   spec.summary       = %q{Fluentd plugin to support Logstash-inspired Grok format for parsing logs}
@@ -19,5 +19,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "test-unit", ">=3.1.5"
-  spec.add_runtime_dependency "fluentd", ">=0.14.6"
+  spec.add_runtime_dependency "fluentd", ">=0.14.6", "< 2"
 end
