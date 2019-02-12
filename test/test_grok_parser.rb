@@ -191,6 +191,16 @@ class GrokParserTest < ::Test::Unit::TestCase
       error_message = error_logs.first[/error="(.+)"/, 1]
       assert_equal("unknown value conversion for key:'path', type:'foo'", error_message)
     end
+
+    test "keep original configuration" do
+      config = %[
+        <grok>
+          pattern %{INT:user_id:integer} paid %{NUMBER:paid_amount:float}
+        </grok>
+      ]
+      d = create_driver(config)
+      assert_equal("%{INT:user_id:integer} paid %{NUMBER:paid_amount:float}", d.instance.config.elements("grok").first["pattern"])
+    end
   end
 
   sub_test_case "grok_name_key" do
