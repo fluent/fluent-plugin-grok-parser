@@ -158,37 +158,49 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
-  test "no grok patterns" do
-    assert_raise Fluent::ConfigError do
-      create_driver('')
+  sub_test_case "configure" do
+    test "no grok patterns" do
+      assert_raise Fluent::ConfigError do
+        create_driver('')
+      end
     end
-  end
 
-  test "invalid config value type" do
-    assert_raise Fluent::ConfigError do
-      create_driver(%[
+    test "invalid config value type" do
+      assert_raise Fluent::ConfigError do
+        create_driver(%[
+          <grok>
+            pattern %{PATH:path:foo}
+          </grok>
+        ])
+      end
+    end
+
+    test "invalid config value type and normal grok pattern" do
+      d = create_driver(%[
         <grok>
           pattern %{PATH:path:foo}
         </grok>
+        <grok>
+          pattern %{IP:ip_address}
+        </grok>
       ])
+      assert_equal(1, d.instance.instance_variable_get(:@grok).parsers.size)
+      logs = $log.instance_variable_get(:@logger).instance_variable_get(:@logdev).logs
+      error_logs = logs.grep(/error_class/)
+      assert_equal(1, error_logs.size)
+      error_message = error_logs.first[/error="(.+)"/, 1]
+      assert_equal("unknown value conversion for key:'path', type:'foo'", error_message)
     end
-  end
 
-  test "invalid config value type and normal grok pattern" do
-    d = create_driver(%[
-      <grok>
-        pattern %{PATH:path:foo}
-      </grok>
-      <grok>
-        pattern %{IP:ip_address}
-      </grok>
-    ])
-    assert_equal(1, d.instance.instance_variable_get(:@grok).parsers.size)
-    logs = $log.instance_variable_get(:@logger).instance_variable_get(:@logdev).logs
-    error_logs = logs.grep(/error_class/)
-    assert_equal(1, error_logs.size)
-    error_message = error_logs.first[/error="(.+)"/, 1]
-    assert_equal("unknown value conversion for key:'path', type:'foo'", error_message)
+    test "keep original configuration" do
+      config = %[
+        <grok>
+          pattern %{INT:user_id:integer} paid %{NUMBER:paid_amount:float}
+        </grok>
+      ]
+      d = create_driver(config)
+      assert_equal("%{INT:user_id:integer} paid %{NUMBER:paid_amount:float}", d.instance.config.elements("grok").first["pattern"])
+    end
   end
 
   sub_test_case "grok_name_key" do
