@@ -359,6 +359,21 @@ class GrokParserTest < ::Test::Unit::TestCase
         assert_equal(event_time("28/Feb/2013:12:00:00 +0900", format: "%d/%b/%Y:%H:%M:%S %z"), time)
       end
     end
+
+    test "leading time type with following other type" do
+      d = create_driver(%[
+        <grok>
+          pattern \\[%{HTTPDATE:log_timestamp:time:%d/%b/%Y:%H:%M:%S %z}\\] %{GREEDYDATA:message}
+        </grok>
+      ])
+      expected_record = {
+        "log_timestamp" => event_time("03/Feb/2019:06:47:21 +0530", format: "%d/%b/%Y:%H:%M:%S %z"),
+        "message" => "Python-urllib/2.7"
+      }
+      d.instance.parse('[03/Feb/2019:06:47:21 +0530] Python-urllib/2.7') do |time, record|
+        assert_equal(expected_record, record)
+      end
+    end
   end
 
   private
