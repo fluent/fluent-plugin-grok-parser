@@ -95,7 +95,7 @@ You can use this parser without `multiline_start_regexp` when you know your data
 
 ## Configurations
 
-* See also: [Parser Plugin Overview](https://docs.fluentd.org/configuration/parse-section)
+* See also: [Config: Parse Section - Fluentd](https://docs.fluentd.org/configuration/parse-section)
 
 * **time_format** (string) (optional): The format of the time field.
 * **grok_pattern** (string) (optional): The pattern of grok. You cannot specify multiple grok pattern with this.
