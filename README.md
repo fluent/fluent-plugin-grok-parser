@@ -95,8 +95,7 @@ You can use this parser without `multiline_start_regexp` when you know your data
 
 ## Configurations
 
-* See also: [TimeParameters Plugin Overview](https://docs.fluentd.org/v1.0/articles/timeparameters-plugin-overview)
-* See also: [Parser Plugin Overview](https://docs.fluentd.org/v1.0/articles/parser-plugin-overview)
+* See also: [Parser Plugin Overview](https://docs.fluentd.org/configuration/parse-section)
 
 * **time_format** (string) (optional): The format of the time field.
 * **grok_pattern** (string) (optional): The pattern of grok. You cannot specify multiple grok pattern with this.
@@ -271,7 +270,7 @@ Here is a sample config using the Grok parser with `in_tail` and the `types` par
 
 If you want to use this plugin with Fluentd v0.12.x or earlier, you can use this plugin version v1.x.
 
-See also: [Plugin Management | Fluentd](http://docs.fluentd.org/articles/plugin-management#plugin-version-management)
+See also: [Plugin Management | Fluentd](https://docs.fluentd.org/deployment/plugin-management)
 
 ## License
 
