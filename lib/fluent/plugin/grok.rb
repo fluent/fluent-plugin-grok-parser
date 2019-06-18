@@ -41,7 +41,7 @@ module Fluent
       if @plugin.respond_to?(:time_format)
         @time_format = @plugin.time_format
       end
-      if @plugin.respond_to?(:timezon)
+      if @plugin.respond_to?(:timezone)
         @timezone = @plugin.timezone
       end
     end
