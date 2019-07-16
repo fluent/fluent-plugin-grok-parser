@@ -104,6 +104,17 @@ You can use this parser without `multiline_start_regexp` when you know your data
 * **grok_name_key** (string) (optional): The key name to store grok section's name
 * **multi_line_start_regexp** (string) (optional): The regexp to match beginning of multiline. This is only for "multiline_grok".
 
+### \<grok\> section (optional) (multiple)
+
+* **name** (string) (optional): The name of this grok section
+* **pattern** (string) (required): The pattern of grok
+* **keep_time_key** (bool) (optional): If true, keep time field in the record.
+* **time_key** (string) (optional): Specify time field for event time. If the event doesn't have this field, current time is used.
+  * Default value: `time`.
+* **time_format** (string) (optional): Process value using specified format. This is available only when time_type is string
+* **timezone** (string) (optional): Use specified timezone. one can parse/format the time value in the specified timezone.
+
+
 ## Examples
 
 ### Using grok\_failure\_key
@@ -182,6 +193,28 @@ This will add keys like following:
 
 Add `grokfailure` key to the record if the record does not match any grok pattern.
 See also test code for more details.
+
+## How to parse time value using specific timezone
+
+```aconf
+<source>
+  @type tail
+  path /path/to/log
+  tag grokked_log
+  <parse>
+    @type grok
+    <grok>
+      name mylog-without-timezone
+      pattern %{DATESTAMP:time} %{GREEDYDATE:message}
+      timezone Asia/Tokyo
+    </grok>
+  </parse>
+</source>
+```
+
+This will parse the `time` value as "Asia/Tokyo" timezone.
+
+See [Config: Parse Section - Fluentd](https://docs.fluentd.org/configuration/parse-section) for more details about timezone.
 
 ## How to write Grok patterns
 

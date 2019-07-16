@@ -374,6 +374,46 @@ class GrokParserTest < ::Test::Unit::TestCase
         assert_equal(expected_record, record)
       end
     end
+
+    test "timezone" do
+      d = create_driver(%[
+        <grok>
+          pattern %{TIMESTAMP_ISO8601:time} %{GREEDYDATA:message}
+          time_key time
+          time_format %Y-%m-%d %H:%M:%S
+          timezone Europe/Berlin
+        </grok>
+      ])
+      d.instance.parse("2019-02-01 12:34:56 This is test") do |time, record|
+        assert_equal(event_time("2019-02-01 12:34:56 +0100"), time)
+        assert_equal({ "message" => "This is test" }, record)
+      end
+    end
+
+    test "multiple timezone" do
+      d = create_driver(%[
+        <grok>
+          pattern %{TIMESTAMP_ISO8601:time} 1 %{GREEDYDATA:message}
+          time_key time
+          time_format %Y-%m-%d %H:%M:%S
+          timezone Europe/Berlin
+        </grok>
+        <grok>
+          pattern %{TIMESTAMP_ISO8601:time} 2 %{GREEDYDATA:message}
+          time_key time
+          time_format %Y-%m-%d %H:%M:%S
+          timezone Asia/Aden
+        </grok>
+      ])
+      d.instance.parse("2019-02-01 12:34:56 1 This is test") do |time, record|
+        assert_equal(event_time("2019-02-01 12:34:56 +0100"), time)
+        assert_equal({ "message" => "This is test" }, record)
+      end
+      d.instance.parse("2019-02-01 12:34:56 2 This is test") do |time, record|
+        assert_equal(event_time("2019-02-01 12:34:56 +0300"), time)
+        assert_equal({ "message" => "This is test" }, record)
+      end
+    end
   end
 
   private

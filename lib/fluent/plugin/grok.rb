@@ -27,6 +27,8 @@ module Fluent
       @multiline_mode = false
       @conf = conf
       @plugin = plugin
+      @time_format = nil
+      @timezone = nil
       if @plugin.respond_to?(:firstline?)
         @multiline_mode = true
       end
@@ -38,6 +40,9 @@ module Fluent
       end
       if @plugin.respond_to?(:time_format)
         @time_format = @plugin.time_format
+      end
+      if @plugin.respond_to?(:timezone)
+        @timezone = @plugin.timezone
       end
     end
 
@@ -104,6 +109,9 @@ module Fluent
       end
       if conf["time_format"] || @time_format
         _conf["time_format"] = conf["time_format"] || @time_format
+      end
+      if conf["timezone"] || @timezone
+        _conf["timezone"] = conf["timezone"] || @timezone
       end
       _conf["expression"] = regexp
       config = Fluent::Config::Element.new("parse", "", _conf, [])

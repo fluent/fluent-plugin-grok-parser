@@ -22,9 +22,14 @@ module Fluent
         config_param :name, :string, default: nil
         desc "The pattern of grok"
         config_param :pattern, :string
+        desc "If true, keep time field in the record."
         config_param :keep_time_key, :bool, default: false
+        desc "Specify time field for event time. If the event doesn't have this field, current time is used."
         config_param :time_key, :string, default: "time"
+        desc "Process value using specified format. This is available only when time_type is string"
         config_param :time_format, :string, default: nil
+        desc "Use specified timezone. one can parse/format the time value in the specified timezone."
+        config_param :timezone, :string, default: nil
       end
 
       def initialize
