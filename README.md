@@ -1,4 +1,7 @@
-# Grok Parser for Fluentd [![Build Status](https://travis-ci.org/fluent/fluent-plugin-grok-parser.svg?branch=master)](https://travis-ci.org/fluent/fluent-plugin-grok-parser)
+# Grok Parser for Fluentd
+
+![Testing on Ubuntu](https://github.com/fluent/fluent-plugin-grok-parser/workflows/Testing%20on%20Ubuntu/badge.svg?branch=master)
+![Testing on macOS](https://github.com/fluent/fluent-plugin-grok-parser/workflows/Testing%20on%20macOS/badge.svg?branch=master)
 
 This is a Fluentd plugin to enable Logstash's Grok-like parsing logic.
 
