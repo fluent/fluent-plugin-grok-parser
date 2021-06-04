@@ -1,3 +1,6 @@
-REDISTIMESTAMP %{MONTHDAY} %{MONTH} %{TIME}
-REDISLOG \[%{POSINT:pid}\] %{REDISTIMESTAMP:timestamp} \* 
+REDISLEVEL [.\-*#]
+REDISTIMESTAMP1 %{MONTHDAY} %{MONTH} %{TIME}
+REDISTIMESTAMP2 %{MONTHDAY} %{MONTH} %{YEAR} %{TIME}
+REDISLOG \[%{POSINT:pid}\] %{REDISTIMESTAMP1:timestamp} \* 
 REDISMONLOG %{NUMBER:timestamp} \[%{INT:database} %{IP:client}:%{NUMBER:port}\] "%{WORD:command}"\s?%{GREEDYDATA:params}
+REDIS5LOG %{POSINT:pid}:%{CHAR:role} %{REDISTIMESTAMP2:timestamp} %{REDISLEVEL:log_level} %{GREEDYDATA:message}
