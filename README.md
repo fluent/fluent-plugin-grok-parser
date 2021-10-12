@@ -106,6 +106,8 @@ You can use this parser without `multiline_start_regexp` when you know your data
 * **grok_failure_key** (string) (optional): The key has grok failure reason.
 * **grok_name_key** (string) (optional): The key name to store grok section's name
 * **multi_line_start_regexp** (string) (optional): The regexp to match beginning of multiline. This is only for "multiline_grok".
+* **grok_pattern_series** (enum) (optional): Specify grok pattern series set.
+  * Default value: `legacy`.
 
 ### \<grok\> section (optional) (multiple)
 
