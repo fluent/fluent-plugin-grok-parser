@@ -46,7 +46,7 @@ extracts the first IP address that matches in the log.
   <parse>
     @type grok
     <grok>
-      pattern %{COMBINEDAPACHELOG}
+      pattern %{HTTPD_COMBINEDLOG}
       time_format "%d/%b/%Y:%H:%M:%S %z"
     </grok>
     <grok>
@@ -173,7 +173,7 @@ This generates following events:
     grok_failure_key grokfailure
     <grok>
       name apache_log
-      pattern %{COMBINEDAPACHELOG}
+      pattern %{HTTPD_COMBINEDLOG}
       time_format "%d/%b/%Y:%H:%M:%S %z"
     </grok>
     <grok>
@@ -190,7 +190,7 @@ This generates following events:
 
 This will add keys like following:
 
-* Add `grok_name: "apache_log"` if the record matches `COMBINEDAPACHELOG`
+* Add `grok_name: "apache_log"` if the record matches `HTTPD_COMBINEDLOG`
 * Add `grok_name: "ip_address"` if the record matches `IP`
 * Add `grok_name: "rest_message"` if the record matches `GREEDYDATA`
 
