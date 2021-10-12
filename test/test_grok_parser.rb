@@ -55,7 +55,7 @@ class GrokParserTest < ::Test::Unit::TestCase
 
   sub_test_case "complex pattern w/ grok_pattern_series" do
     test "legacy" do
-      internal_test_grok_pattern("%{COMBINEDAPACHELOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
+      internal_test_grok_pattern("%{HTTPD_COMBINEDLOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
                                   str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
                                   {
                                     "clientip"    => "127.0.0.1",
@@ -76,7 +76,7 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
 
     test "ecs-v1" do
-      internal_test_grok_pattern("%{COMBINEDAPACHELOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
+      internal_test_grok_pattern("%{HTTPD_COMBINEDLOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
                                   str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
                                   {
                                     "[apache][access][user][identity]" => "192.168.0.1",
