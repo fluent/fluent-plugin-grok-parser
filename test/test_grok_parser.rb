@@ -79,14 +79,14 @@ class GrokParserTest < ::Test::Unit::TestCase
       internal_test_grok_pattern("%{HTTPD_COMBINEDLOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
                                   str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
                                   {
-                                    "[apache][access][user][identity]" => "192.168.0.1",
-                                    "[http][request][method]"          => "GET",
-                                    "[http][response][body][bytes]"    => 777,
-                                    "[http][response][status_code]"    => 200,
-                                    "[http][version]"                  => "1.1",
-                                    "[source][address]"                => "127.0.0.1",
-                                    "[url][original]"                  => "/",
-                                    "[user_agent][original]"           => "Opera/12.0",
+                                    "apache.access.user.identity" => "192.168.0.1",
+                                    "http.request.method"         => "GET",
+                                    "http.response.body.bytes"    => 777,
+                                    "http.response.status_code"   => 200,
+                                    "http.version"                => "1.1",
+                                    "source.address"              => "127.0.0.1",
+                                    "url.original"                => "/",
+                                    "user_agent.original"         => "Opera/12.0",
                                   },
                                   "time_key" => "timestamp",
                                   "time_format" => "%d/%b/%Y:%H:%M:%S %z",
@@ -394,14 +394,14 @@ class GrokParserTest < ::Test::Unit::TestCase
           </grok>
         ])
         expected_record = {
-          "[apache][access][user][identity]" => "192.168.0.1",
-          "[http][request][method]"          => "GET",
-          "[http][response][body][bytes]"    => 777,
-          "[http][response][status_code]"    => 200,
-          "[http][version]"                  => "1.1",
-          "[source][address]"                => "127.0.0.1",
-          "[url][original]"                  => "/",
-          "[user_agent][original]"           => "Opera/12.0"
+          "apache.access.user.identity" => "192.168.0.1",
+          "http.request.method"         => "GET",
+          "http.response.body.bytes"    => 777,
+          "http.response.status_code"   => 200,
+          "http.version"                => "1.1",
+          "source.address"              => "127.0.0.1",
+          "url.original"                => "/",
+          "user_agent.original"         => "Opera/12.0"
         }
         d.instance.parse('127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"') do |time, record|
           assert_equal(expected_record, record)
