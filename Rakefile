@@ -15,9 +15,11 @@ end
 
 desc "Import patterns from submodules"
 task "patterns:import" do
-  `git submodule --quiet foreach pwd`.split($\).each do |submodule_path|
-    Dir.glob(File.join(submodule_path, "patterns/*")) do |pattern|
-      cp(pattern, "patterns/", verbose: true)
+  ["legacy", "ecs-v1"].each do |series|
+    `git submodule --quiet foreach pwd`.split($\).each do |submodule_path|
+      Dir.glob(File.join(submodule_path, "patterns/#{series}/*")) do |pattern|
+        cp(pattern, "patterns/#{series}", verbose: true)
+      end
     end
   end
 
@@ -32,29 +34,30 @@ task "patterns:import" do
                             array(?::.)?)))?)?
       )
     \}/x
-
-  Dir.glob("patterns/*") do |pattern_file|
-    new_lines = ""
-    File.readlines(pattern_file).each do |line|
-      case
-      when line.strip.empty?
-        new_lines << line
-      when line.start_with?("#")
-        new_lines << line
-      else
-        name, pattern = line.split(/\s+/, 2)
-        new_pattern = pattern.gsub(pattern_re) do |m|
-          matched = $~
-          if matched[:type] == "int"
-            "%{#{matched[:pattern]}:#{matched[:subname]}:integer}"
-          else
-            m
+  ["legacy", "ecs-v1"].each do |series|
+    Dir.glob("patterns/#{series}/*") do |pattern_file|
+      new_lines = ""
+      File.readlines(pattern_file).each do |line|
+        case
+        when line.strip.empty?
+          new_lines << line
+        when line.start_with?("#")
+          new_lines << line
+        else
+          name, pattern = line.split(/\s+/, 2)
+          new_pattern = pattern.gsub(pattern_re) do |m|
+            matched = $~
+            if matched[:type] == "int"
+              "%{#{matched[:pattern]}:#{matched[:subname]}:integer}"
+            else
+              m
+            end
           end
+          new_lines << "#{name} #{new_pattern}"
         end
-        new_lines << "#{name} #{new_pattern}"
       end
+      File.write(pattern_file, new_lines)
     end
-    File.write(pattern_file, new_lines)
   end
 end
 

@@ -53,24 +53,46 @@ class GrokParserTest < ::Test::Unit::TestCase
                                {"mac_address" => "DEAD.BEEF.1234", "ip_address" => "127.0.0.1"})
   end
 
-  test "complex pattern" do
-    internal_test_grok_pattern("%{COMBINEDAPACHELOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
-                                str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
-                                {
-                                  "clientip"    => "127.0.0.1",
-                                  "ident"       => "192.168.0.1",
-                                  "auth"        => "-",
-                                  "verb"        => "GET",
-                                  "request"     => "/",
-                                  "httpversion" => "1.1",
-                                  "response"    => "200",
-                                  "bytes"       => "777",
-                                  "referrer"    => "\"-\"",
-                                  "agent"       => "\"Opera/12.0\""
-                                },
-                                "time_key" => "timestamp",
-                                "time_format" => "%d/%b/%Y:%H:%M:%S %z"
-                              )
+  sub_test_case "complex pattern w/ grok_pattern_series" do
+    test "legacy" do
+      internal_test_grok_pattern("%{HTTPD_COMBINEDLOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
+                                  str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
+                                  {
+                                    "clientip"    => "127.0.0.1",
+                                    "ident"       => "192.168.0.1",
+                                    "auth"        => "-",
+                                    "verb"        => "GET",
+                                    "request"     => "/",
+                                    "httpversion" => "1.1",
+                                    "response"    => "200",
+                                    "bytes"       => "777",
+                                    "referrer"    => "\"-\"",
+                                    "agent"       => "\"Opera/12.0\""
+                                  },
+                                  "time_key" => "timestamp",
+                                  "time_format" => "%d/%b/%Y:%H:%M:%S %z",
+                                  "grok_pattern_series" => "legacy"
+                                )
+    end
+
+    test "ecs-v1" do
+      internal_test_grok_pattern("%{HTTPD_COMBINEDLOG}", '127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"',
+                                  str2time("28/Feb/2013:12:00:00 +0900", "%d/%b/%Y:%H:%M:%S %z"),
+                                  {
+                                    "apache.access.user.identity" => "192.168.0.1",
+                                    "http.request.method"         => "GET",
+                                    "http.response.body.bytes"    => 777,
+                                    "http.response.status_code"   => 200,
+                                    "http.version"                => "1.1",
+                                    "source.address"              => "127.0.0.1",
+                                    "url.original"                => "/",
+                                    "user_agent.original"         => "Opera/12.0",
+                                  },
+                                  "time_key" => "timestamp",
+                                  "time_format" => "%d/%b/%Y:%H:%M:%S %z",
+                                  "grok_pattern_series" => "ecs-v1"
+                                )
+    end
   end
 
   test "custom pattern" do
@@ -334,29 +356,57 @@ class GrokParserTest < ::Test::Unit::TestCase
   end
 
   sub_test_case "grok section" do
-    test "complex pattern" do
-      d = create_driver(%[
-        <grok>
-          pattern %{COMBINEDAPACHELOG}
-          time_key timestamp
-          time_format %d/%b/%Y:%H:%M:%S %z
-        </grok>
-      ])
-      expected_record = {
-        "clientip"    => "127.0.0.1",
-        "ident"       => "192.168.0.1",
-        "auth"        => "-",
-        "verb"        => "GET",
-        "request"     => "/",
-        "httpversion" => "1.1",
-        "response"    => "200",
-        "bytes"       => "777",
-        "referrer"    => "\"-\"",
-        "agent"       => "\"Opera/12.0\""
-      }
-      d.instance.parse('127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"') do |time, record|
-        assert_equal(expected_record, record)
-        assert_equal(event_time("28/Feb/2013:12:00:00 +0900", format: "%d/%b/%Y:%H:%M:%S %z"), time)
+    sub_test_case "complex pattern w/ grok_pattern_series" do
+      test "legacy" do
+        d = create_driver(%[
+          grok_pattern_series legacy
+          <grok>
+            pattern %{COMBINEDAPACHELOG}
+            time_key timestamp
+            time_format %d/%b/%Y:%H:%M:%S %z
+          </grok>
+        ])
+        expected_record = {
+          "clientip"    => "127.0.0.1",
+          "ident"       => "192.168.0.1",
+          "auth"        => "-",
+          "verb"        => "GET",
+          "request"     => "/",
+          "httpversion" => "1.1",
+          "response"    => "200",
+          "bytes"       => "777",
+          "referrer"    => "\"-\"",
+          "agent"       => "\"Opera/12.0\""
+        }
+        d.instance.parse('127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"') do |time, record|
+          assert_equal(expected_record, record)
+          assert_equal(event_time("28/Feb/2013:12:00:00 +0900", format: "%d/%b/%Y:%H:%M:%S %z"), time)
+        end
+      end
+
+      test "ecs-v1" do
+        d = create_driver(%[
+          grok_pattern_series ecs-v1
+          <grok>
+            pattern %{HTTPD_COMBINEDLOG}
+            time_key timestamp
+            time_format %d/%b/%Y:%H:%M:%S %z
+          </grok>
+        ])
+        expected_record = {
+          "apache.access.user.identity" => "192.168.0.1",
+          "http.request.method"         => "GET",
+          "http.response.body.bytes"    => 777,
+          "http.response.status_code"   => 200,
+          "http.version"                => "1.1",
+          "source.address"              => "127.0.0.1",
+          "url.original"                => "/",
+          "user_agent.original"         => "Opera/12.0"
+        }
+        d.instance.parse('127.0.0.1 192.168.0.1 - [28/Feb/2013:12:00:00 +0900] "GET / HTTP/1.1" 200 777 "-" "Opera/12.0"') do |time, record|
+          assert_equal(expected_record, record)
+          assert_equal(event_time("28/Feb/2013:12:00:00 +0900", format: "%d/%b/%Y:%H:%M:%S %z"), time)
+        end
       end
     end
 

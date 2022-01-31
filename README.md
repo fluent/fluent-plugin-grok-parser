@@ -46,7 +46,7 @@ extracts the first IP address that matches in the log.
   <parse>
     @type grok
     <grok>
-      pattern %{COMBINEDAPACHELOG}
+      pattern %{HTTPD_COMBINEDLOG}
       time_format "%d/%b/%Y:%H:%M:%S %z"
     </grok>
     <grok>
@@ -106,6 +106,8 @@ You can use this parser without `multiline_start_regexp` when you know your data
 * **grok_failure_key** (string) (optional): The key has grok failure reason.
 * **grok_name_key** (string) (optional): The key name to store grok section's name
 * **multi_line_start_regexp** (string) (optional): The regexp to match beginning of multiline. This is only for "multiline_grok".
+* **grok_pattern_series** (enum) (optional): Specify grok pattern series set.
+  * Default value: `legacy`.
 
 ### \<grok\> section (optional) (multiple)
 
@@ -173,7 +175,7 @@ This generates following events:
     grok_failure_key grokfailure
     <grok>
       name apache_log
-      pattern %{COMBINEDAPACHELOG}
+      pattern %{HTTPD_COMBINEDLOG}
       time_format "%d/%b/%Y:%H:%M:%S %z"
     </grok>
     <grok>
@@ -190,7 +192,7 @@ This generates following events:
 
 This will add keys like following:
 
-* Add `grok_name: "apache_log"` if the record matches `COMBINEDAPACHELOG`
+* Add `grok_name: "apache_log"` if the record matches `HTTPD_COMBINEDLOG`
 * Add `grok_name: "ip_address"` if the record matches `IP`
 * Add `grok_name: "rest_message"` if the record matches `GREEDYDATA`
 

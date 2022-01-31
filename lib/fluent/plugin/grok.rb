@@ -134,8 +134,15 @@ module Fluent
         curr_pattern = @pattern_map[m["pattern"]]
         raise GrokPatternNotFoundError, "grok pattern not found: #{pattern}" unless curr_pattern
         if m["subname"]
-          replacement_pattern = "(?<#{m["subname"]}>#{curr_pattern})"
-          type_map[m["subname"]] = m["type"] || "string"
+          ecs = /(?<ecs-key>(^\[.*\]$))/.match(m["subname"])
+          subname = if ecs
+                      # remove starting "[" and trailing "]" on matched data
+                      ecs["ecs-key"][1..-2].split("][").join('.')
+                    else
+                      m["subname"]
+                    end
+          replacement_pattern = "(?<#{subname}>#{curr_pattern})"
+          type_map[subname] = m["type"] || "string"
         else
           replacement_pattern = "(?:#{curr_pattern})"
         end

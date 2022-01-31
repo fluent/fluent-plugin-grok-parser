@@ -16,6 +16,8 @@ module Fluent
       config_param :grok_failure_key, :string, default: nil
       desc "The key name to store grok section's name"
       config_param :grok_name_key, :string, default: nil
+      desc "Specify grok pattern series set"
+      config_param :grok_pattern_series, :enum, list: [:legacy, :"ecs-v1"], default: :legacy
 
       config_section :grok, param_name: "grok_confs", multi: true do
         desc "The name of this grok section"
@@ -42,7 +44,7 @@ module Fluent
 
         @grok = Grok.new(self, conf)
 
-        default_pattern_dir = File.expand_path("../../../../patterns/*", __FILE__)
+        default_pattern_dir = File.expand_path("../../../../patterns/#{@grok_pattern_series}/*", __FILE__)
         Dir.glob(default_pattern_dir) do |pattern_file_path|
           @grok.add_patterns_from_file(pattern_file_path)
         end
