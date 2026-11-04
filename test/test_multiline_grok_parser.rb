@@ -95,6 +95,28 @@ TEXT
     end
   end
 
+  test "non-ASCII binary text" do
+    text = "2023-11-22 18:18:09.823+0100 Testing München\njavax.management.RuntimeErrorException: null".b
+    d = create_driver(%[
+      multiline_start_regexp /\\d{4}-\\d{1,2}-\\d{1,2}/
+      <grok>
+        pattern %{HTTPDATE:timestamp} %{NUMBER:response}
+      </grok>
+      <grok>
+        pattern %{TIMESTAMP_ISO8601:timestamp} %{GREEDYDATA:message}
+      </grok>
+    ])
+    records = []
+    d.instance.parse(text) do |_time, record|
+      records << record
+    end
+    expected = [{
+      "timestamp" => "2023-11-22 18:18:09.823+0100",
+      "message" => "Testing München\njavax.management.RuntimeErrorException: null".b
+    }]
+    assert_equal(expected, records)
+  end
+
   test "no_grok_patterns" do
     assert_raise Fluent::ConfigError do
       create_driver('')
