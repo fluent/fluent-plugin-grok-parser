@@ -466,6 +466,84 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
+  sub_test_case "non-ASCII binary text" do
+    test "pattern with non-ASCII characters matches" do
+      d = create_driver(%[
+        <grok>
+          pattern %{HTTPDATE:timestamp} %{GREEDYDATA:city}
+        </grok>
+      ])
+      records = []
+      d.instance.parse("22/Nov/2023:18:18:09 +0100 München".b) do |_time, record|
+        records << record
+      end
+      expected = [{ "timestamp" => "22/Nov/2023:18:18:09 +0100", "city" => "München" }]
+      assert_equal(expected, records)
+    end
+
+    test "falls through to the next grok section" do
+      d = create_driver(%[
+        grok_name_key grok_name
+        <grok>
+          pattern %{HTTPDATE:timestamp} %{NUMBER:response}
+        </grok>
+        <grok>
+          pattern %{TIMESTAMP_ISO8601:timestamp} %{GREEDYDATA:message}
+        </grok>
+      ])
+      records = []
+      d.instance.parse("2023-11-22 18:18:09.823+0100 Testing München".b) do |_time, record|
+        records << record
+      end
+      expected = [{
+        "timestamp" => "2023-11-22 18:18:09.823+0100",
+        "message" => "Testing München".b,
+        "grok_name" => 1
+      }]
+      assert_equal(expected, records)
+    end
+
+    test "invalid UTF-8 text falls back to grok_failure_key" do
+      d = create_driver(%[
+        grok_failure_key grok_failure
+        <grok>
+          pattern %{HTTPDATE:timestamp} %{GREEDYDATA:city}
+        </grok>
+      ])
+      records = []
+      d.instance.parse("22/Nov/2023:18:18:09 +0100 M\xFCnchen".b) do |_time, record|
+        records << record
+      end
+      expected = [{
+        "message" => "22/Nov/2023:18:18:09 +0100 M\xFCnchen".b,
+        "grok_failure" => "No grok pattern matched"
+      }]
+      assert_equal(expected, records)
+    end
+
+    test "text in another encoding is not retried as UTF-8" do
+      d = create_driver(%[
+        <grok>
+          pattern %{HTTPDATE:timestamp} %{GREEDYDATA:city}
+        </grok>
+      ])
+      text = "22/Nov/2023:18:18:09 +0100 MÃ¼nchen".encode("ISO-8859-1")
+      assert_raise(Encoding::CompatibilityError) do
+        d.instance.parse(text) {}
+      end
+    end
+
+    test "an error on the UTF-8 retry is raised" do
+      d = create_driver({
+        "grok_pattern" => "%{HTTPDATE:timestamp} %{GREEDYDATA:message}",
+        "null_value_pattern" => "なし".b
+      })
+      assert_raise(Encoding::CompatibilityError) do
+        d.instance.parse("22/Nov/2023:18:18:09 +0100 München".b) {}
+      end
+    end
+  end
+
   private
 
   def create_driver(conf)

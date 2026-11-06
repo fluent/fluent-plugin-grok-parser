@@ -64,18 +64,33 @@ module Fluent
 
       def parse(text)
         @grok.parsers.each do |name_or_index, parser|
-          parser.parse(text) do |time, record|
-            if time and record
-              record[@grok_name_key] = name_or_index if @grok_name_key
-              yield time, record
-              return
-            end
+          time, record = parse_by(parser, text)
+          if time and record
+            record[@grok_name_key] = name_or_index if @grok_name_key
+            yield time, record
+            return
           end
         end
         @default_parser.parse(text) do |time, record|
           record[@grok_failure_key] = "No grok pattern matched" if @grok_failure_key
           yield time, record
         end
+      end
+
+      private
+
+      def parse_by(parser, text)
+        parser.parse(text) do |time, record|
+          return time, record
+        end
+        nil
+      rescue Encoding::CompatibilityError
+        raise unless text.encoding == Encoding::ASCII_8BIT
+        # Some bundled patterns (e.g. MONTH) contain non-ASCII characters, so their
+        # regexps are UTF-8 and raise on non-ASCII binary text such as in_tail lines.
+        utf8_text = text.dup.force_encoding(Encoding::UTF_8)
+        return nil unless utf8_text.valid_encoding?
+        parse_by(parser, utf8_text)
       end
     end
   end
