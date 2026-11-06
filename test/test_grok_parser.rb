@@ -520,6 +520,28 @@ class GrokParserTest < ::Test::Unit::TestCase
       }]
       assert_equal(expected, records)
     end
+
+    test "text in another encoding is not retried as UTF-8" do
+      d = create_driver(%[
+        <grok>
+          pattern %{HTTPDATE:timestamp} %{GREEDYDATA:city}
+        </grok>
+      ])
+      text = "22/Nov/2023:18:18:09 +0100 MÃ¼nchen".encode("ISO-8859-1")
+      assert_raise(Encoding::CompatibilityError) do
+        d.instance.parse(text) {}
+      end
+    end
+
+    test "an error on the UTF-8 retry is raised" do
+      d = create_driver({
+        "grok_pattern" => "%{HTTPDATE:timestamp} %{GREEDYDATA:message}",
+        "null_value_pattern" => "なし".b
+      })
+      assert_raise(Encoding::CompatibilityError) do
+        d.instance.parse("22/Nov/2023:18:18:09 +0100 München".b) {}
+      end
+    end
   end
 
   private

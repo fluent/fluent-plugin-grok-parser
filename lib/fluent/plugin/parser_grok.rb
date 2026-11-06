@@ -85,6 +85,7 @@ module Fluent
         end
         nil
       rescue Encoding::CompatibilityError
+        raise unless text.encoding == Encoding::ASCII_8BIT
         # Some bundled patterns (e.g. MONTH) contain non-ASCII characters, so their
         # regexps are UTF-8 and raise on non-ASCII binary text such as in_tail lines.
         utf8_text = text.dup.force_encoding(Encoding::UTF_8)
