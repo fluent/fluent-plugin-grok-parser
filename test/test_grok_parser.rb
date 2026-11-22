@@ -180,6 +180,36 @@ class GrokParserTest < ::Test::Unit::TestCase
     end
   end
 
+  sub_test_case "estimate_current_event" do
+    test "false keeps the matched record instead of falling back" do
+      config = %[
+        estimate_current_event false
+        grok_failure_key grok_failure
+        grok_pattern %{IP:ip_address}
+      ]
+      d = create_driver(config)
+      parsed = []
+      d.instance.parse("127.0.0.1") do |time, record|
+        parsed << [time, record]
+      end
+      assert_equal([[nil, {"ip_address" => "127.0.0.1"}]], parsed)
+    end
+
+    test "false leaves the time of an unmatched line nil" do
+      config = %[
+        estimate_current_event false
+        grok_failure_key grok_failure
+        grok_pattern %{IP:ip_address}
+      ]
+      d = create_driver(config)
+      parsed = []
+      d.instance.parse("not-an-ip") do |time, record|
+        parsed << [time, record]
+      end
+      assert_equal([[nil, {"message" => "not-an-ip", "grok_failure" => "No grok pattern matched"}]], parsed)
+    end
+  end
+
   sub_test_case "configure" do
     test "no grok patterns" do
       assert_raise Fluent::ConfigError do
