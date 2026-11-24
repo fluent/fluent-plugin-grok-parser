@@ -60,12 +60,16 @@ module Fluent
         end
 
         @grok.setup
+
+        if (parser = @grok.parsers[:grok_pattern])
+          @default_parser.estimate_current_event = parser.estimate_current_event
+        end
       end
 
       def parse(text)
         @grok.parsers.each do |name_or_index, parser|
           time, record = parse_by(parser, text)
-          if time and record
+          if record
             record[@grok_name_key] = name_or_index if @grok_name_key
             yield time, record
             return
